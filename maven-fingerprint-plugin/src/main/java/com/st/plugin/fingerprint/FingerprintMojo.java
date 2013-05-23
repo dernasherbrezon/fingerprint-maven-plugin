@@ -1,81 +1,59 @@
 package com.st.plugin.fingerprint;
 
-import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import org.apache.maven.plugin.AbstractMojo;
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
+
+import java.io.*;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.maven.plugin.AbstractMojo;
-import org.apache.maven.plugin.MojoExecutionException;
-
-/**
- * @goal generate
- * 
- * @phase pre-package
- */
+@Mojo(name = "generate", defaultPhase = LifecyclePhase.PREPARE_PACKAGE)
 public class FingerprintMojo extends AbstractMojo {
 
-	private static final Pattern LINK_PATTERN = Pattern.compile("(<link.*?href=\")(.*?)(\".*?>)");
-	private static final Pattern SCRIPT_PATTERN = Pattern.compile("(\")([^\\s]*?\\.js)(\")");
-	private static final Pattern IMG_PATTERN = Pattern.compile("(<img.*?src=\")(.*?)(\".*?>)");
-	private static final Pattern CSS_IMG_PATTERN = Pattern.compile("(url\\(\")(.*?)(\"\\))");
+	private Pattern LINK_PATTERN = Pattern.compile("(<link.*?href=\")(.*?)(\".*?>)");
+	private Pattern SCRIPT_PATTERN = Pattern.compile("(\")([^\\s]*?\\.js)(\")");
+	private Pattern IMG_PATTERN = Pattern.compile("(<img.*?src=\")(.*?)(\".*?>)");
+	private Pattern CSS_IMG_PATTERN = Pattern.compile("(url\\(\")(.*?)(\"\\))");
 
 	/**
 	 * Output directory
-	 * 
-	 * @parameter expression="${project.build.directory}/fingered-web"
-	 * @required
 	 */
+	@Parameter(defaultValue = "${project.build.directory}/fingered-web", required = true)
 	private File outputDirectory;
 
 	/**
 	 * Webapp directory
-	 * 
-	 * @parameter expression="${basedir}/src/main/webapp"
-	 * @required
 	 */
+	@Parameter(defaultValue="${basedir}/src/main/webapp", required = true)
 	private File sourceDirectory;
 
 	/**
 	 * Exclude resources
-	 * 
-	 * @parameter
-	 * 
 	 */
+	@Parameter
 	private List<String> excludeResources;
 
-	/**
-	 * @parameter
-	 */
+	@Parameter
 	private List<String> extensionsToFilter;
 
-	/**
-	 * @parameter
-	 */
+	@Parameter
 	private Set<String> trimTagExtensions;
 
 	/**
 	 * CDN url
-	 * 
-	 * @parameter
 	 */
+	@Parameter
 	private String cdn;
+
+	@Parameter
+	private List<String> linkPatterns;
 
 	private final Map<String, String> processedFiles = new HashMap<String, String>();
 
@@ -123,6 +101,7 @@ public class FingerprintMojo extends AbstractMojo {
 		outputFileData = processPattern(SCRIPT_PATTERN, outputFileData.toString());
 		outputFileData = processPattern(IMG_PATTERN, outputFileData.toString());
 		outputFileData = processPattern(CSS_IMG_PATTERN, outputFileData.toString());
+		// TODO: Add another pattern here! -- scott smith
 		String processedData = null;
 		if (trimTagExtensions != null && !trimTagExtensions.isEmpty()) {
 			String extension = getExtension(fileToProcess.getName());
