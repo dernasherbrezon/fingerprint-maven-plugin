@@ -14,13 +14,22 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-@Mojo(name = "generate", defaultPhase = LifecyclePhase.PREPARE_PACKAGE)
+@Mojo(name = "generate", defaultPhase = LifecyclePhase.PROCESS_RESOURCES)
 public class FingerprintMojo extends AbstractMojo {
 
+	/*
+	 *  All resources should have absolute paths:
+     *  Valid: <img src="/img/test.png"> .
+     *  Invalid: <img src="test.png">
+     *	All resources should point to existing files without any pre-processing:
+     *  Valid: <img src="/img/test.png"> .
+     *  Invalid: <img src="<c:if test="${var}">/img/test.png</c:if>"
+	 */
 	private Pattern LINK_PATTERN = Pattern.compile("(<link.*?href=\")(.*?)(\".*?>)");
 	private Pattern SCRIPT_PATTERN = Pattern.compile("(\")([^\\s]*?\\.js)(\")");
 	private Pattern IMG_PATTERN = Pattern.compile("(<img.*?src=\")(.*?)(\".*?>)");
 	private Pattern CSS_IMG_PATTERN = Pattern.compile("(url\\(\")(.*?)(\"\\))");
+	private Pattern CUSTOM_PATTERN = Pattern.compile("(<c:url.*?value=\")(.*?)(\".*?>)");
 
 	/**
 	 * Output directory
@@ -97,11 +106,13 @@ public class FingerprintMojo extends AbstractMojo {
 		}
 		getLog().info("processing file: " + fileToProcess.getAbsolutePath());
 		String data = readFile(fileToProcess);
-		StringBuffer outputFileData = processPattern(LINK_PATTERN, data);
+		StringBuffer outputFileData = new StringBuffer(data);
+		outputFileData = processPattern(LINK_PATTERN, outputFileData.toString());
 		outputFileData = processPattern(SCRIPT_PATTERN, outputFileData.toString());
 		outputFileData = processPattern(IMG_PATTERN, outputFileData.toString());
 		outputFileData = processPattern(CSS_IMG_PATTERN, outputFileData.toString());
 		// TODO: Add another pattern here! -- scott smith
+		outputFileData = processPattern(CUSTOM_PATTERN, outputFileData.toString());
 		String processedData = null;
 		if (trimTagExtensions != null && !trimTagExtensions.isEmpty()) {
 			String extension = getExtension(fileToProcess.getName());
