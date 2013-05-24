@@ -51,14 +51,15 @@
 					<skipErrorNoDescriptorsFound>true</skipErrorNoDescriptorsFound>
 					<extractors>
 						<!-- We only need the java extractor and not the bsh one -->
-						<extractor>java</extractor>
+						<extractor>java-annotations</extractor>
 					</extractors>
 				</configuration>
 				<executions>
 					<execution>
-						<id>generated-helpmojo</id>
+						<id>mojo-descriptor</id>
+						<phase>process-classes</phase>
 						<goals>
-							<goal>helpmojo</goal>
+							<goal>descriptor</goal>
 						</goals>
 					</execution>
 				</executions>
