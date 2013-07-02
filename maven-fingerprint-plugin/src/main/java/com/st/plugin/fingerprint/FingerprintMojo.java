@@ -66,6 +66,7 @@ public class FingerprintMojo extends AbstractMojo {
 
 	private final Map<String, String> processedFiles = new HashMap<String, String>();
 
+	@Override
 	public void execute() throws MojoExecutionException {
 		if (!sourceDirectory.isDirectory()) {
 			throw new MojoExecutionException("source directory is not a directory: " + sourceDirectory.getAbsolutePath());
