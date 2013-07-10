@@ -28,8 +28,7 @@ public class FingerprintMojo extends AbstractMojo {
 	public Pattern LINK_PATTERN = Pattern.compile("(<link.*?href=\")(.*?)(\".*?>)");
 	public Pattern SCRIPT_PATTERN = Pattern.compile("(\")([^\\s]*?\\.js)(\")");
 	public Pattern IMG_PATTERN = Pattern.compile("(<img.*?src=\")(.*?)(\".*?>)");
-	public Pattern CSS_IMG_PATTERN = Pattern.compile("(url\\(\")(.*?)(\"\\))");
-	public Pattern CUSTOM_PATTERN = Pattern.compile("(<c:url.*?value=\")(.*?)(\".*?>)");
+	public Pattern CSS_IMG_PATTERN = Pattern.compile("(url\\([\",'])(.*?)([\",']\\))");
 
 	/**
 	 * Output directory
@@ -112,8 +111,6 @@ public class FingerprintMojo extends AbstractMojo {
 		outputFileData = processPattern(SCRIPT_PATTERN, outputFileData.toString());
 		outputFileData = processPattern(IMG_PATTERN, outputFileData.toString());
 		outputFileData = processPattern(CSS_IMG_PATTERN, outputFileData.toString());
-		// TODO: Add another pattern here! -- scott smith
-		outputFileData = processPattern(CUSTOM_PATTERN, outputFileData.toString());
 		String processedData = null;
 		if (trimTagExtensions != null && !trimTagExtensions.isEmpty()) {
 			String extension = getExtension(fileToProcess.getName());
