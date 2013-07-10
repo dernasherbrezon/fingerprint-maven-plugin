@@ -42,27 +42,51 @@ public class FingerprintMojoTest {
 		System.out.println("Patterns Test");
 
 		Pattern linkPattern = fingerprintMojo.LINK_PATTERN;
-		String linkUrl = "<link rel=\"stylesheet\" href=\"${basePath}/resources/css/style.css\" />";
+		String linkUrl = "<link rel=\"stylesheet\" href=\"${pageContext.request.contextPath}/resources/css/style.css\" />";
 		Matcher linkMatcher = linkPattern.matcher(linkUrl);
 		assertTrue(linkMatcher.find());
 
 		Pattern scriptPattern = fingerprintMojo.SCRIPT_PATTERN;
-		String scriptUrl = "<script src=\"${basePath}/resources/js/vendor/zepto.js\">";
+		String scriptUrl = "<script src=\"${pageContext.request.contextPath}/resources/js/vendor/zepto.js\">";
 		Matcher scriptMatcher = scriptPattern.matcher(scriptUrl);
 		assertTrue(scriptMatcher.find());
 
 		Pattern imgPattern = fingerprintMojo.IMG_PATTERN;
-		String imageUrl = "<img src=\"/images/favicon-whatever.ico\" />";
+		String imageUrl = "<img src=\"${pageContext.request.contextPath}/images/favicon-whatever.ico\" />";
 		Matcher imgMatcher = imgPattern.matcher(imageUrl);
 		assertTrue(imgMatcher.find());
 
+		// Tests for the CSS image references
 		Pattern cssPattern = fingerprintMojo.CSS_IMG_PATTERN;
+		// Double quotes url, absolute location
 		String cssUrl1 = "url(\"/images/navigation-s66728e073e.png\")";
 		Matcher cssMatcher1 = cssPattern.matcher(cssUrl1);
 		assertTrue(cssMatcher1.find());
+
+		// Single quotes url, absolute location
 		String cssUrl2 = "url('/images/navigation-s66728e073e.png')";
 		Matcher cssMatcher2 = cssPattern.matcher(cssUrl2);
 		assertTrue(cssMatcher2.find());
 
+		// Double quotes url, relative location
+		String cssUrl3 = "url(\"../images/navigation-s66728e073e.png\")";
+		Matcher cssMatcher3 = cssPattern.matcher(cssUrl3);
+		assertTrue(cssMatcher3.find());
+
+		// Double quotes url, relative location
+		String cssUrl4 = "url('../images/navigation-s66728e073e.png')";
+		Matcher cssMatcher4 = cssPattern.matcher(cssUrl4);
+		assertTrue(cssMatcher4.find());
+
+		// JSTL url, absolute
+		Pattern jstlUrlPattern = fingerprintMojo.JSTL_URL_PATTERN;
+		String jstlUrl1 = "<c:url value=\"/resources/images/favicon.ico\" var=\"faviconUrl\"/>";
+		Matcher jstlUrlMatcher1 = jstlUrlPattern.matcher(jstlUrl1);
+		assertTrue(jstlUrlMatcher1.find());
+
+		// JSTL url, with context root
+		String jstlUrl2 = "<c:url value=\"${pageContext.request.contextPath}/resources/images/favicon.ico\" var=\"faviconUrl\"/>";
+		Matcher jstlUrlMatcher2 = jstlUrlPattern.matcher(jstlUrl2);
+		assertTrue(jstlUrlMatcher2.find());
 	}
 }
