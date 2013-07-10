@@ -25,11 +25,11 @@ public class FingerprintMojo extends AbstractMojo {
      *  Valid: <img src="/img/test.png"> .
      *  Invalid: <img src="<c:if test="${var}">/img/test.png</c:if>"
 	 */
-	private Pattern LINK_PATTERN = Pattern.compile("(<link.*?href=\")(.*?)(\".*?>)");
-	private Pattern SCRIPT_PATTERN = Pattern.compile("(\")([^\\s]*?\\.js)(\")");
-	private Pattern IMG_PATTERN = Pattern.compile("(<img.*?src=\")(.*?)(\".*?>)");
-	private Pattern CSS_IMG_PATTERN = Pattern.compile("(url\\(\")(.*?)(\"\\))");
-	private Pattern CUSTOM_PATTERN = Pattern.compile("(<c:url.*?value=\")(.*?)(\".*?>)");
+	public Pattern LINK_PATTERN = Pattern.compile("(<link.*?href=\")(.*?)(\".*?>)");
+	public Pattern SCRIPT_PATTERN = Pattern.compile("(\")([^\\s]*?\\.js)(\")");
+	public Pattern IMG_PATTERN = Pattern.compile("(<img.*?src=\")(.*?)(\".*?>)");
+	public Pattern CSS_IMG_PATTERN = Pattern.compile("(url\\(\")(.*?)(\"\\))");
+	public Pattern CUSTOM_PATTERN = Pattern.compile("(<c:url.*?value=\")(.*?)(\".*?>)");
 
 	/**
 	 * Output directory
