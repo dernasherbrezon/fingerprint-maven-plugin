@@ -61,9 +61,6 @@ public class FingerprintMojo extends AbstractMojo {
 	@Parameter
 	private String cdn;
 
-	@Parameter
-	private List<String> linkPatterns;
-
 	private final Map<String, String> processedFiles = new HashMap<String, String>();
 
 	@Override
