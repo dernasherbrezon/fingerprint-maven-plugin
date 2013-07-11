@@ -57,13 +57,7 @@
 				<executions>
 					<execution>
 						<id>mojo-descriptor</id>
-						<!-- Files are properly processed, but are not in the resulting war -->
 						<phase>process-classes</phase>
-						<!-- Does not work and it should -->
-						<!--<phase>process-resources</phase>-->
-						<!--<phase>generate-resources</phase>-->
-						<!-- Files are not processed but it works otherwise -->
-						<!--<phase>prepare-package</phase>-->
 						<goals>
 							<goal>descriptor</goal>
 						</goals>
