@@ -6,6 +6,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
 
 /**
  * @author Richard Scott Smith <scott.smith@isostech.com>
@@ -88,5 +89,10 @@ public class FingerprintMojoTest {
 		String jstlUrl2 = "<c:url value=\"${pageContext.request.contextPath}/resources/images/favicon.ico\" var=\"faviconUrl\"/>";
 		Matcher jstlUrlMatcher2 = jstlUrlPattern.matcher(jstlUrl2);
 		assertTrue(jstlUrlMatcher2.find());
+
+		// JSTL url, href
+		String jstlUrl3 = "<c:url value=\"http://www.fedex.com/Tracking?ascend_header=1&amp;clienttype=dotcom&amp;cntry_code=us&amp;language=english&amp;tracknumbers=${shipment.trackingNumber}\" var=\"fedexUrl\"/>";
+		Matcher jstlUrlMatcher3 = jstlUrlPattern.matcher(jstlUrl3);
+		assertFalse(jstlUrlMatcher3.find());
 	}
 }
