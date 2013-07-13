@@ -2,12 +2,11 @@ package com.st.plugin.fingerprint;
 
 import org.junit.*;
 
+import java.io.File;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 /**
  * @author Richard Scott Smith <scott.smith@isostech.com>
@@ -104,5 +103,15 @@ public class FingerprintMojoTest {
 		String url1 = "/resources/css/global.css";
 		String processedUrl1 = FingerprintMojo.generateTargetResourceFilename("1234567890", url1);
 		assertEquals("/resources/css/1234567890global.css", processedUrl1);
+	}
+
+	@Test
+	public void testGenerateTargetFilename() throws Exception {
+		System.out.println("Test generateTargetFilename");
+
+		File file = new File("/src/test/resources/dummy-file-for-testing.txt");
+		File sourceDirectory = new File("/src/test/resources/");
+		String targetHtmlFilename = FingerprintMojo.generateTargetFilename(sourceDirectory, file);
+		assertEquals("/dummy-file-for-testing.txt", targetHtmlFilename);
 	}
 }
