@@ -7,6 +7,7 @@ import java.util.regex.Pattern;
 
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Richard Scott Smith <scott.smith@isostech.com>
@@ -94,5 +95,14 @@ public class FingerprintMojoTest {
 		String jstlUrl3 = "<c:url value=\"http://www.fedex.com/Tracking?ascend_header=1&amp;clienttype=dotcom&amp;cntry_code=us&amp;language=english&amp;tracknumbers=${shipment.trackingNumber}\" var=\"fedexUrl\"/>";
 		Matcher jstlUrlMatcher3 = jstlUrlPattern.matcher(jstlUrl3);
 		assertFalse(jstlUrlMatcher3.find());
+	}
+
+	@Test
+	public void testGenerateTargetResourceFilename() throws Exception {
+		System.out.println("Test generateTargetResourceFilename");
+
+		String url1 = "/resources/css/global.css";
+		String processedUrl1 = FingerprintMojo.generateTargetResourceFilename("1234567890", url1);
+		assertEquals("/resources/css/1234567890global.css", processedUrl1);
 	}
 }
