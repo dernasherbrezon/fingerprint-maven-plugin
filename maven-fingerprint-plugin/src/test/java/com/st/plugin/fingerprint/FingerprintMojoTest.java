@@ -114,4 +114,21 @@ public class FingerprintMojoTest {
 		String targetHtmlFilename = FingerprintMojo.generateTargetFilename(sourceDirectory, file);
 		assertEquals("/dummy-file-for-testing.txt", targetHtmlFilename);
 	}
+
+	@Test
+	public void testGetExtension() throws Exception {
+		System.out.println("Test getExtension");
+
+		String filename1 = "/src/test/resources/dummy-file-for-testing.txt";
+		String filenameExtension = FingerprintMojo.getExtension(filename1);
+		assertEquals("txt", filenameExtension);
+
+		String filename2 = "dummy-file-for-testing.txt";
+		filenameExtension = FingerprintMojo.getExtension(filename2);
+		assertEquals("txt", filenameExtension);
+
+		String filename3 = "dummy-file-for-testing";
+		filenameExtension = FingerprintMojo.getExtension(filename3);
+		assertEquals(null, filenameExtension);
+	}
 }

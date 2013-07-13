@@ -393,7 +393,7 @@ public class FingerprintMojo extends AbstractMojo {
 		}
 	}
 
-	private static String getExtension(String filename) {
+	public static String getExtension(String filename) {
 		int extensionIndex = filename.lastIndexOf(".");
 		if (extensionIndex == -1) {
 			return null;
