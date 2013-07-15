@@ -109,7 +109,7 @@ public class FingerprintMojoTest {
 		// JSTL url, with context root
 		String jstlUrl2 = "<c:url value=\"${pageContext.request.contextPath}/resources/images/favicon.ico\" var=\"faviconUrl\"/>";
 		Matcher jstlUrlMatcher2 = jstlUrlPattern.matcher(jstlUrl2);
-		assertTrue(jstlUrlMatcher2.find());
+		assertFalse(jstlUrlMatcher2.find());
 
 		// JSTL url, href
 		String jstlUrl3 = "<c:url value=\"http://www.fedex.com/Tracking?ascend_header=1&amp;clienttype=dotcom&amp;cntry_code=us&amp;language=english&amp;tracknumbers=${shipment.trackingNumber}\" var=\"fedexUrl\"/>";

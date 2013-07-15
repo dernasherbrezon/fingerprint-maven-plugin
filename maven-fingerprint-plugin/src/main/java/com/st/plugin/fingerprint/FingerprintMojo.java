@@ -29,7 +29,7 @@ public class FingerprintMojo extends AbstractMojo {
 	public Pattern SCRIPT_PATTERN = Pattern.compile("(\")([^\\s]*?\\.js)(\")");
 	public Pattern IMG_PATTERN = Pattern.compile("(<img.*?src=\")(.*?)(\".*?>)");
 	public Pattern CSS_IMG_PATTERN = Pattern.compile("(url\\([\",'])(.*?)([\",']\\))");
-	public Pattern JSTL_URL_PATTERN = Pattern.compile("(<c:url.*?value=\")[^href](.*?)(\".*?>)");
+	public Pattern JSTL_URL_PATTERN = Pattern.compile("(<c:url.*?value=\")(/{1}.*?)(\".*?>)");
 
 	/**
 	 * Output directory
@@ -155,6 +155,9 @@ public class FingerprintMojo extends AbstractMojo {
 		Matcher m = p.matcher(data);
 		while (m.find()) {
 			String curLink = m.group(2);
+			for (int i = 0; i < m.groupCount(); ++i) {
+				getLog().debug("group " + i + ": " + m.group(i));
+			}
 			if (isExcluded(curLink)) {
 				getLog().info("resource excluded: " + curLink);
 				m.appendReplacement(outputFileData, "$1" + curLink + "$3");
