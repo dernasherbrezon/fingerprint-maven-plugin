@@ -108,6 +108,31 @@ public class FingerprintMojoTest {
 	}
 
 	@Test
+	public void testExecute() throws Exception {
+
+	}
+
+	@Test
+	public void testProcessPage() throws Exception {
+
+	}
+
+	@Test
+	public void testProcessPattern() throws Exception {
+
+	}
+
+	@Test
+	public void testIsExcluded() throws Exception {
+
+	}
+
+	@Test
+	public void testGenerateFingerprint() throws Exception {
+
+	}
+
+	@Test
 	public void testGenerateTargetResourceFilename() throws Exception {
 		System.out.println("Test generateTargetResourceFilename");
 
@@ -127,6 +152,44 @@ public class FingerprintMojoTest {
 	}
 
 	@Test
+	public void testCopyDirectories() throws Exception {
+
+	}
+
+	@Test
+	public void testCopyDeepFiles() throws Exception {
+
+	}
+
+	@Test
+	public void testReadFile() throws Exception {
+
+	}
+
+	@Test
+	public void testReadBinaryFile() throws Exception {
+
+	}
+
+	@Test
+	public void testCopy() throws Exception {
+
+	}
+
+	@Test
+	public void testFindPagesToFilter() throws Exception {
+		System.out.println("Test findPagesToFilter");
+
+		File directory = new File("src/test/resources");
+		List<File> files = new ArrayList<File>();
+		fingerprintMojo.findPagesToFilter(files, directory);
+		File expectedFile = new File("src/test/resources/dummy-file-for-testing.txt");
+		List<File> expectedFiles = new ArrayList<File>();
+		expectedFiles.add(expectedFile);
+		assertEquals(expectedFiles, files);
+	}
+
+	@Test
 	public void testGetExtension() throws Exception {
 		System.out.println("Test getExtension");
 
@@ -141,18 +204,5 @@ public class FingerprintMojoTest {
 		String filename3 = "dummy-file-for-testing";
 		filenameExtension = FingerprintMojo.getExtension(filename3);
 		assertEquals(null, filenameExtension);
-	}
-
-	@Test
-	public void testFindPagesToFilter() throws Exception {
-		System.out.println("Test findPagesToFilter");
-
-		File directory = new File("src/test/resources");
-		List<File> files = new ArrayList<File>();
-		fingerprintMojo.findPagesToFilter(files, directory);
-		File expectedFile = new File("src/test/resources/dummy-file-for-testing.txt");
-		List<File> expectedFiles = new ArrayList<File>();
-		expectedFiles.add(expectedFile);
-		assertEquals(expectedFiles, files);
 	}
 }
