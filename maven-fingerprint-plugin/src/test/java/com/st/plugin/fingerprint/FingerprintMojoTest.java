@@ -35,9 +35,19 @@ public class FingerprintMojoTest {
 		List<String> extensionsToFilter = new ArrayList<String>();
 		extensionsToFilter.add("txt");
 		Class<FingerprintMojo> clazz = FingerprintMojo.class;
-		Field field = clazz.getDeclaredField("extensionsToFilter");
-		field.setAccessible(true);
-		field.set(fingerprintMojo, extensionsToFilter);
+		Field extensionsToFilterField = clazz.getDeclaredField("extensionsToFilter");
+		extensionsToFilterField.setAccessible(true);
+		extensionsToFilterField.set(fingerprintMojo, extensionsToFilter);
+
+		File sourceDirectory = new File("src/test/resources");
+		Field sourceDirectoryField = clazz.getDeclaredField("sourceDirectory");
+		sourceDirectoryField.setAccessible(true);
+		sourceDirectoryField.set(fingerprintMojo, sourceDirectory);
+
+		File outputDirectory = new File("src/test/fingered-web");
+		Field outputDirectoryField = clazz.getDeclaredField("outputDirectory");
+		outputDirectoryField.setAccessible(true);
+		outputDirectoryField.set(fingerprintMojo, outputDirectory);
 	}
 
 	@After
@@ -109,7 +119,7 @@ public class FingerprintMojoTest {
 
 	@Test
 	public void testExecute() throws Exception {
-
+		fingerprintMojo.execute();
 	}
 
 	@Test
