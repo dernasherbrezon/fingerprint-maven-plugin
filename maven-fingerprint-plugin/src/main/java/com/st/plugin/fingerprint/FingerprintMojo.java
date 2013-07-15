@@ -366,7 +366,7 @@ public class FingerprintMojo extends AbstractMojo {
 		outputStream.close();
 	}
 
-	private void findPagesToFilter(List<File> output, File source) {
+	public void findPagesToFilter(List<File> output, File source) {
 		if (!source.isDirectory()) {
 			return;
 		}

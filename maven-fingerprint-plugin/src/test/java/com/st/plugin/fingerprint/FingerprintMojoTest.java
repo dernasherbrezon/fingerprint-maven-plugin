@@ -3,6 +3,9 @@ package com.st.plugin.fingerprint;
 import org.junit.*;
 
 import java.io.File;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -27,6 +30,14 @@ public class FingerprintMojoTest {
 	@Before
 	public void setUp() throws Exception {
 		fingerprintMojo = new FingerprintMojo();
+
+		// Configure the instance
+		List<String> extensionsToFilter = new ArrayList<String>();
+		extensionsToFilter.add("txt");
+		Class<FingerprintMojo> clazz = FingerprintMojo.class;
+		Field field = clazz.getDeclaredField("extensionsToFilter");
+		field.setAccessible(true);
+		field.set(fingerprintMojo, extensionsToFilter);
 	}
 
 	@After
@@ -109,8 +120,8 @@ public class FingerprintMojoTest {
 	public void testGenerateTargetFilename() throws Exception {
 		System.out.println("Test generateTargetFilename");
 
-		File file = new File("/src/test/resources/dummy-file-for-testing.txt");
-		File sourceDirectory = new File("/src/test/resources/");
+		File file = new File("src/test/resources/dummy-file-for-testing.txt");
+		File sourceDirectory = new File("src/test/resources/");
 		String targetHtmlFilename = FingerprintMojo.generateTargetFilename(sourceDirectory, file);
 		assertEquals("/dummy-file-for-testing.txt", targetHtmlFilename);
 	}
@@ -130,5 +141,18 @@ public class FingerprintMojoTest {
 		String filename3 = "dummy-file-for-testing";
 		filenameExtension = FingerprintMojo.getExtension(filename3);
 		assertEquals(null, filenameExtension);
+	}
+
+	@Test
+	public void testFindPagesToFilter() throws Exception {
+		System.out.println("Test findPagesToFilter");
+
+		File directory = new File("src/test/resources");
+		List<File> files = new ArrayList<File>();
+		fingerprintMojo.findPagesToFilter(files, directory);
+		File expectedFile = new File("src/test/resources/dummy-file-for-testing.txt");
+		List<File> expectedFiles = new ArrayList<File>();
+		expectedFiles.add(expectedFile);
+		assertEquals(expectedFiles, files);
 	}
 }
