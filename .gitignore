@@ -5,3 +5,6 @@
 /maven-fingerprint-plugin/.settings
 /maven-fingerprint-plugin/fingerprint-plugin.iml
 /.idea
+
+# We don't want to keep cruft from JUnit test runs in version control
+/src/test/fingered-web
