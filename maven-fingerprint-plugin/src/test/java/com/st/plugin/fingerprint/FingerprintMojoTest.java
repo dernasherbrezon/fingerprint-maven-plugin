@@ -1,6 +1,7 @@
 package com.st.plugin.fingerprint;
 
-import org.junit.*;
+import org.junit.Before;
+import org.junit.Test;
 
 import java.io.File;
 import java.lang.reflect.Field;
@@ -9,23 +10,15 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Richard Scott Smith <scott.smith@isostech.com>
  */
 public class FingerprintMojoTest {
 	FingerprintMojo fingerprintMojo;
-
-	@BeforeClass
-	public static void setUpClass() throws Exception {
-
-	}
-
-	@AfterClass
-	public static void tearDownClass() throws Exception {
-
-	}
 
 	@Before
 	public void setUp() throws Exception {
@@ -48,11 +41,6 @@ public class FingerprintMojoTest {
 		Field outputDirectoryField = clazz.getDeclaredField("outputDirectory");
 		outputDirectoryField.setAccessible(true);
 		outputDirectoryField.set(fingerprintMojo, outputDirectory);
-	}
-
-	@After
-	public void tearDown() throws Exception {
-
 	}
 
 	/**
@@ -123,26 +111,6 @@ public class FingerprintMojoTest {
 	}
 
 	@Test
-	public void testProcessPage() throws Exception {
-
-	}
-
-	@Test
-	public void testProcessPattern() throws Exception {
-
-	}
-
-	@Test
-	public void testIsExcluded() throws Exception {
-
-	}
-
-	@Test
-	public void testGenerateFingerprint() throws Exception {
-
-	}
-
-	@Test
 	public void testGenerateTargetResourceFilename() throws Exception {
 		System.out.println("Test generateTargetResourceFilename");
 
@@ -159,31 +127,6 @@ public class FingerprintMojoTest {
 		File sourceDirectory = new File("src/test/resources/");
 		String targetHtmlFilename = FingerprintMojo.generateTargetFilename(sourceDirectory, file);
 		assertEquals("/dummy-file-for-testing.txt", targetHtmlFilename);
-	}
-
-	@Test
-	public void testCopyDirectories() throws Exception {
-
-	}
-
-	@Test
-	public void testCopyDeepFiles() throws Exception {
-
-	}
-
-	@Test
-	public void testReadFile() throws Exception {
-
-	}
-
-	@Test
-	public void testReadBinaryFile() throws Exception {
-
-	}
-
-	@Test
-	public void testCopy() throws Exception {
-
 	}
 
 	@Test
