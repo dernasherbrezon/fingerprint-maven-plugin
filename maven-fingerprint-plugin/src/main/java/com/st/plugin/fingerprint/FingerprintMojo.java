@@ -170,6 +170,7 @@ public class FingerprintMojo extends AbstractMojo {
 			String curLink = m.group(2);
 			if (isExcluded(curLink)) {
 				getLog().info("resource excluded: " + curLink);
+				curLink = curLink.replaceAll("\\$", "\\\\\\$");
 				m.appendReplacement(outputFileData, "$1" + curLink + "$3");
 				continue;
 			}
