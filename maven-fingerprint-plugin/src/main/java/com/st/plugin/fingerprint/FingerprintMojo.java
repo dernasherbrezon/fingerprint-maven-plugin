@@ -1,33 +1,45 @@
 package com.st.plugin.fingerprint;
 
+import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.math.BigInteger;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 
-import java.io.*;
-import java.math.BigInteger;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-@Mojo(name = "generate", defaultPhase = LifecyclePhase.PROCESS_RESOURCES)
+@Mojo(name = "generate", defaultPhase = LifecyclePhase.PACKAGE)
 public class FingerprintMojo extends AbstractMojo {
 
 	/*
-	 *  All resources should have absolute paths:
-     *  Valid: <img src="/img/test.png"> .
-     *  Invalid: <img src="test.png">
-     *	All resources should point to existing files without any pre-processing:
-     *  Valid: <img src="/img/test.png"> .
-     *  Invalid: <img src="<c:if test="${var}">/img/test.png</c:if>"
+	 * All resources should have absolute paths: Valid: <img
+	 * src="/img/test.png"> . Invalid: <img src="test.png"> All resources should
+	 * point to existing files without any pre-processing: Valid: <img
+	 * src="/img/test.png"> . Invalid: <img
+	 * src="<c:if test="${var}">/img/test.png</c:if>"
 	 */
 	public Pattern LINK_PATTERN = Pattern.compile("(<link.*?href=\")(.*?)(\".*?>)");
 	public Pattern SCRIPT_PATTERN = Pattern.compile("(\")([^\\s]*?\\.js)(\")");
-	public Pattern IMG_PATTERN = Pattern.compile("(<img.*?src=\")(.*?)(\".*?>)");
+	public Pattern IMG_PATTERN = Pattern.compile("(<img.*?src=\")([^\\}\\{]*?)(\".*?>)");
 	public Pattern CSS_IMG_PATTERN = Pattern.compile("(url\\([\",'])(.*?)([\",']\\))");
 	public Pattern JSTL_URL_PATTERN = Pattern.compile("(<c:url.*?value=\")(/{1}.*?)(\".*?>)");
 
@@ -40,7 +52,7 @@ public class FingerprintMojo extends AbstractMojo {
 	/**
 	 * Webapp directory
 	 */
-	@Parameter(defaultValue="${basedir}/src/main/webapp", required = true)
+	@Parameter(defaultValue = "${basedir}/src/main/webapp", required = true)
 	private File sourceDirectory;
 
 	/**
@@ -85,7 +97,12 @@ public class FingerprintMojo extends AbstractMojo {
 		copyDirectories(sourceDirectory, outputDirectory);
 
 		for (File curHTml : pagesToFilter) {
-			processPage(curHTml);
+			try {
+				processPage(curHTml);
+			} catch (Exception e) {
+				getLog().error("unable to process: " + curHTml.getAbsolutePath(), e);
+				throw new MojoExecutionException("unable to process: " + curHTml.getAbsolutePath(), e);
+			}
 		}
 
 		try {

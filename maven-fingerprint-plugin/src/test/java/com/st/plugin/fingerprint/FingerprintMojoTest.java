@@ -64,7 +64,7 @@ public class FingerprintMojoTest {
 		Pattern imgPattern = fingerprintMojo.IMG_PATTERN;
 		String imageUrl = "<img src=\"${pageContext.request.contextPath}/images/favicon-whatever.ico\" />";
 		Matcher imgMatcher = imgPattern.matcher(imageUrl);
-		assertTrue(imgMatcher.find());
+		assertFalse(imgMatcher.find());
 
 		// Tests for the CSS image references
 		Pattern cssPattern = fingerprintMojo.CSS_IMG_PATTERN;
