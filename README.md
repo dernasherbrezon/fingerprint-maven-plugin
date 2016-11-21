@@ -1,17 +1,17 @@
 maven-fingerprint-plugin
 ========================
 
-Maven Plugin for Fingerprinting Web Resources
+Maven plugin for web resources optimization
 
 About
 =====
 
 Fingerprint is a generation of md5 sum of the whole file. 
-Fingerprinting used to improve web resource caching. For example: rename file from `file.css` to `<md5>file.css`, where `<md5>` is a md5 of the whole file.
+Fingerprinting used to improve web resource caching. For example: rename file from `file.css` to `<md5>file.css`, where `<md5>` is a file checksum.
 
-This plugin filters out (recursivly) source directory, detects any resources using the patterns below and copy result (if needed) to target directory.
+This plugin filters out (recursivly) source directory, detects any resources using the patterns below and copy result (if needed) to the target directory.
 
-The following patterns are used to detect resources to fingerprint:
+The following patterns are used to detect resources eligible for fingerprinting:
   * `<link.*?href="(.*?)".*?>`
   * `"([^\\s]*?\\.js)"`
   * `<img.*?src="(.*?)".*?>`
@@ -31,17 +31,6 @@ Requirements
 
 Configuration
 =============
-
-  * Add maven repo:
-
-```xml
-  <pluginRepositories>
-		<pluginRepository>
-                        <id>fprint-repo</id>
-                        <url>https://raw.github.com/dernasherbrezon/maven-fingerprint-plugin/master/maven-fingerprint-plugin/mvn-repo</url>
-		</pluginRepository>
-	</pluginRepositories>
-```
 
   * Configure plugin in pom.xml. Example configuration with comments:
   
