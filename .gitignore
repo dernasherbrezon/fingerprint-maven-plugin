@@ -8,3 +8,4 @@
 
 # We don't want to keep cruft from JUnit test runs in version control
 /maven-fingerprint-plugin/src/test/fingered-web
+/target/
