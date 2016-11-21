@@ -1,4 +1,4 @@
-package com.st.plugin.fingerprint;
+package com.st.maven.fingerprint;
 
 import java.util.ArrayList;
 import java.util.List;

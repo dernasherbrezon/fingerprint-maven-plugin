@@ -1,7 +1,9 @@
-package com.st.plugin.fingerprint;
+package com.st.maven.fingerprint;
 
 import org.junit.Before;
 import org.junit.Test;
+
+import com.st.maven.fingerprint.FingerprintMojo;
 
 import java.io.File;
 import java.lang.reflect.Field;
@@ -49,8 +51,6 @@ public class FingerprintMojoTest {
 	 */
 	@Test
 	public void testPattern() throws Exception {
-		System.out.println("Patterns Test");
-
 		Pattern linkPattern = fingerprintMojo.LINK_PATTERN;
 		String linkUrl = "<link rel=\"stylesheet\" href=\"${pageContext.request.contextPath}/resources/css/style.css\" />";
 		Matcher linkMatcher = linkPattern.matcher(linkUrl);
@@ -112,8 +112,6 @@ public class FingerprintMojoTest {
 
 	@Test
 	public void testGenerateTargetResourceFilename() throws Exception {
-		System.out.println("Test generateTargetResourceFilename");
-
 		String url1 = "/resources/css/global.css";
 		String processedUrl1 = FingerprintMojo.generateTargetResourceFilename("1234567890", url1);
 		assertEquals("/resources/css/1234567890global.css", processedUrl1);
@@ -121,8 +119,6 @@ public class FingerprintMojoTest {
 
 	@Test
 	public void testGenerateTargetFilename() throws Exception {
-		System.out.println("Test generateTargetFilename");
-
 		File file = new File("src/test/resources/dummy-file-for-testing.txt");
 		File sourceDirectory = new File("src/test/resources/");
 		String targetHtmlFilename = FingerprintMojo.generateTargetFilename(sourceDirectory, file);
@@ -131,8 +127,6 @@ public class FingerprintMojoTest {
 
 	@Test
 	public void testFindPagesToFilter() throws Exception {
-		System.out.println("Test findPagesToFilter");
-
 		File directory = new File("src/test/resources");
 		List<File> files = new ArrayList<File>();
 		fingerprintMojo.findPagesToFilter(files, directory);
@@ -144,8 +138,6 @@ public class FingerprintMojoTest {
 
 	@Test
 	public void testGetExtension() throws Exception {
-		System.out.println("Test getExtension");
-
 		String filename1 = "/src/test/resources/dummy-file-for-testing.txt";
 		String filenameExtension = FingerprintMojo.getExtension(filename1);
 		assertEquals("txt", filenameExtension);
