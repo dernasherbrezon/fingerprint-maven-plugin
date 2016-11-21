@@ -46,7 +46,7 @@ public class FingerprintMojo extends AbstractMojo {
 	/**
 	 * Output directory
 	 */
-	@Parameter(defaultValue = "${project.build.directory}/fingered-web", required = true)
+	@Parameter(defaultValue = "${project.build.directory}/optimized-webapp", required = true)
 	private File outputDirectory;
 
 	/**
@@ -65,7 +65,7 @@ public class FingerprintMojo extends AbstractMojo {
 	private List<String> extensionsToFilter;
 
 	@Parameter
-	private Set<String> trimTagExtensions;
+	private Set<String> htmlExtensions;
 
 	/**
 	 * CDN url
@@ -128,10 +128,11 @@ public class FingerprintMojo extends AbstractMojo {
 		outputFileData = processPattern(CSS_IMG_PATTERN, outputFileData.toString());
 		outputFileData = processPattern(JSTL_URL_PATTERN, outputFileData.toString());
 		String processedData = null;
-		if (trimTagExtensions != null && !trimTagExtensions.isEmpty()) {
+		if (htmlExtensions != null && !htmlExtensions.isEmpty()) {
 			String extension = getExtension(fileToProcess.getName());
-			if (extension != null && trimTagExtensions.contains(extension)) {
-				processedData = TextShrinker.shrink(outputFileData.toString());
+			if (extension != null && htmlExtensions.contains(extension)) {
+				getLog().info("minify html: " + fileToProcess.getAbsolutePath());
+				processedData = HtmlMinifier.minify(outputFileData.toString());
 			}
 		}
 

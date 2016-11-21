@@ -50,12 +50,12 @@ Configuration
 					</excludeResources>
 <!-- ${basedir}/src/main/webapp by default -->
 					<sourceDirectory>${basedir}/target/webcombined</sourceDirectory>
-<!-- ${project.build.directory}/fingered-web by default -->
-					<outputDirectory>${basedir}/target/fingered</outputDirectory>
+<!-- ${project.build.directory}/optimized-webapp by default -->
+					<outputDirectory>${basedir}/target/optimized-webapp</outputDirectory>
 <!-- Remove unnecessary spaces between tags. Make single line page. Takes into consideration <pre> tags -->
-					<trimTagExtensions>
-						<trimTagExtension>html</trimTagExtension>
-					</trimTagExtensions>
+					<htmlExtensions>
+						<htmlExtension>html</htmlExtension>
+					</htmlExtensions>
 					<extensionsToFilter>
 						<extensionToFilter>html</extensionToFilter>
 						<extensionToFilter>jsp</extensionToFilter>

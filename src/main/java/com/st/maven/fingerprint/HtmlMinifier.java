@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-class TextShrinker {
+class HtmlMinifier {
 
 	private final static Pattern newLineSymbols = Pattern.compile("[\n\t\r]");
 	private final static Pattern tagWhiteSpaces = Pattern.compile(">(\\s+)<");
@@ -13,7 +13,7 @@ class TextShrinker {
 	private final static String PRE_END_TAG = "</pre>";
 	private final static Pattern DEFAULT_INPUT_TYPE = Pattern.compile("(<input.*?) type=\"text\"");
 
-	static String shrink(String page) {
+	static String minify(String page) {
 		Matcher m = DEFAULT_INPUT_TYPE.matcher(page);
 		
 		StringBuffer sb = new StringBuffer();
