@@ -120,14 +120,16 @@ public class FingerprintMojo extends AbstractMojo {
 		} else {
 			fileToProcess = file;
 		}
-		getLog().info("processing file: " + fileToProcess.getAbsolutePath());
+		if (getLog().isDebugEnabled()) {
+			getLog().debug("processing file: " + fileToProcess.getAbsolutePath());
+		}
 		String data = readFile(fileToProcess);
 		StringBuffer outputFileData = new StringBuffer(data);
-		outputFileData = processPattern(LINK_PATTERN, outputFileData.toString());
-		outputFileData = processPattern(SCRIPT_PATTERN, outputFileData.toString());
-		outputFileData = processPattern(IMG_PATTERN, outputFileData.toString());
-		outputFileData = processPattern(CSS_IMG_PATTERN, outputFileData.toString());
-		outputFileData = processPattern(JSTL_URL_PATTERN, outputFileData.toString());
+		outputFileData = processPattern(LINK_PATTERN, outputFileData.toString(), fileToProcess.getAbsolutePath());
+		outputFileData = processPattern(SCRIPT_PATTERN, outputFileData.toString(), fileToProcess.getAbsolutePath());
+		outputFileData = processPattern(IMG_PATTERN, outputFileData.toString(), fileToProcess.getAbsolutePath());
+		outputFileData = processPattern(CSS_IMG_PATTERN, outputFileData.toString(), fileToProcess.getAbsolutePath());
+		outputFileData = processPattern(JSTL_URL_PATTERN, outputFileData.toString(), fileToProcess.getAbsolutePath());
 		String processedData = null;
 		if (htmlExtensions != null && !htmlExtensions.isEmpty()) {
 			String extension = getExtension(fileToProcess.getName());
@@ -179,7 +181,7 @@ public class FingerprintMojo extends AbstractMojo {
 		}
 	}
 
-	private StringBuffer processPattern(Pattern p, String data) throws MojoExecutionException {
+	private StringBuffer processPattern(Pattern p, String data, String sourceOfData) throws MojoExecutionException {
 		StringBuffer outputFileData = new StringBuffer();
 		Matcher m = p.matcher(data);
 		while (m.find()) {
@@ -207,7 +209,7 @@ public class FingerprintMojo extends AbstractMojo {
 
 			File linkFile = new File(sourceDirectory, curLink);
 			if (!linkFile.exists()) {
-				getLog().warn("resource file doesnt exist: " + curLink + " file: " + linkFile.getName());
+				getLog().warn("resource file doesnt exist: " + curLink + " found in: " + sourceOfData);
 				curLink = curLink.replaceAll("\\$", "\\\\\\$");
 				m.appendReplacement(outputFileData, "$1" + curLink + "$3");
 				continue;
@@ -231,10 +233,12 @@ public class FingerprintMojo extends AbstractMojo {
 			m.appendReplacement(outputFileData, targetURL);
 			File targetFilename = new File(outputDirectory, targetPath);
 			if (targetFilename.exists()) {
-				getLog().info("processing link: " + linkFile.getAbsolutePath());
+				if (getLog().isDebugEnabled()) {
+					getLog().debug("target file already moved: " + linkFile.getAbsolutePath());
+				}
 				continue;
 			}
-			getLog().info("processing link: " + linkFile.getAbsolutePath() + " copy to: " + targetFilename.getAbsolutePath());
+			getLog().info("move fingerprinted resource: " + linkFile.getAbsolutePath() + " to: " + targetFilename.getAbsolutePath());
 			if (processedFiles.containsKey(linkFile.getAbsolutePath())) {
 				String pathWithinSource = linkFile.getAbsolutePath();
 				linkFile = new File(processedFiles.get(pathWithinSource));
