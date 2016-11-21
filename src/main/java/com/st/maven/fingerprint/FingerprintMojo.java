@@ -10,6 +10,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.StringReader;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -134,6 +135,16 @@ public class FingerprintMojo extends AbstractMojo {
 				getLog().info("minify html: " + fileToProcess.getAbsolutePath());
 				processedData = HtmlMinifier.minify(outputFileData.toString());
 			}
+		} else if (fileToProcess.getName().contains(".min.")) {
+			getLog().info("ignoring already minified resource: " + fileToProcess.getAbsolutePath());
+		} else if (fileToProcess.getName().endsWith(".js")) {
+			processedData = outputFileData.toString();
+			getLog().info("minifying javascript: " + fileToProcess.getAbsolutePath());
+			processedData = Compressor.compressJavaScript(new StringReader(processedData), getLog());
+		} else if (fileToProcess.getName().endsWith(".css")) {
+			processedData = outputFileData.toString();
+			getLog().info("minifying css: " + fileToProcess.getAbsolutePath());
+			processedData = Compressor.compressCSS(new StringReader(processedData), getLog());
 		}
 
 		if (processedData == null) {
