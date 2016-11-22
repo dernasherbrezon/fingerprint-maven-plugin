@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.aerse.maven</groupId>
 	<artifactId>fingerprint-maven-plugin</artifactId>
-	<version>3.4-SNAPSHOT</version>
+	<version>3.4</version>
 	<packaging>maven-plugin</packaging>
 	<name>fingerprint-plugin</name>
 	<description>Plugin for web resources optimization</description>
@@ -167,7 +167,7 @@
 		<url>https://github.com/dernasherbrezon/fingerprint-maven-plugin</url>
 		<connection>scm:git:git@github.com/dernasherbrezon/fingerprint-maven-plugin.git</connection>
 		<developerConnection>scm:git:https://github.com/dernasherbrezon/fingerprint-maven-plugin.git</developerConnection>
-      <tag>HEAD</tag>
+      <tag>fingerprint-maven-plugin-3.4</tag>
   </scm>
 	
 	<issueManagement>
