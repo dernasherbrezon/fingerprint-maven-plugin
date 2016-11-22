@@ -1,7 +1,6 @@
 package com.st.maven.fingerprint;
 
 import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -11,9 +10,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.StringReader;
-import java.math.BigInteger;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -22,11 +18,13 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
+import org.codehaus.plexus.util.IOUtil;
 
 @Mojo(name = "generate", defaultPhase = LifecyclePhase.PACKAGE)
 public class FingerprintMojo extends AbstractMojo {
@@ -75,6 +73,7 @@ public class FingerprintMojo extends AbstractMojo {
 	private String cdn;
 
 	private final Map<String, String> processedFiles = new HashMap<String, String>();
+	private final Map<String, String> originalToFingerprinted = new HashMap<String, String>();
 
 	@Override
 	public void execute() throws MojoExecutionException {
@@ -207,20 +206,63 @@ public class FingerprintMojo extends AbstractMojo {
 				}
 			}
 
-			File linkFile = new File(sourceDirectory, curLink);
-			if (!linkFile.exists()) {
-				getLog().warn("resource file doesnt exist: " + curLink + " found in: " + sourceOfData);
-				curLink = curLink.replaceAll("\\$", "\\\\\\$");
-				m.appendReplacement(outputFileData, "$1" + curLink + "$3");
-				continue;
-			}
-			if (curLink.length() > 0 && curLink.charAt(0) != '/') {
-				getLog().warn("resource has relative path: " + curLink);
-			}
-			String fingerprint = generateFingerprint(readBinaryFile(linkFile));
-			String targetPath = generateTargetResourceFilename(fingerprint, curLink);
-			if (targetPath.length() != 0 && targetPath.charAt(0) != '/') {
-				getLog().warn("relative path detected: " + curLink);
+			String targetPath = originalToFingerprinted.get(curLink);
+			if (targetPath == null) {
+				File linkFile = new File(sourceDirectory, curLink);
+				if (!linkFile.exists()) {
+					getLog().warn("resource file doesnt exist: " + curLink + " found in: " + sourceOfData);
+					curLink = curLink.replaceAll("\\$", "\\\\\\$");
+					m.appendReplacement(outputFileData, "$1" + curLink + "$3");
+					continue;
+				}
+				if (curLink.length() > 0 && curLink.charAt(0) != '/') {
+					getLog().warn("resource has relative path: " + curLink);
+				}
+				String fingerprint;
+				FileInputStream fis = null;
+				try {
+					fis = new FileInputStream(linkFile);
+					fingerprint = DigestUtils.md5Hex(fis);
+				} catch (Exception e1) {
+					throw new MojoExecutionException("unable to calculate md5 for file: " + linkFile.getAbsolutePath(), e1);
+				} finally {
+					IOUtil.close(fis);
+				}
+				targetPath = generateTargetResourceFilename(fingerprint, curLink);
+				if (targetPath.length() != 0 && targetPath.charAt(0) != '/') {
+					getLog().warn("relative path detected: " + curLink);
+				}
+				
+				originalToFingerprinted.put(curLink, targetPath);
+				
+				File targetFilename = new File(outputDirectory, targetPath);
+				if (targetFilename.exists()) {
+					if (getLog().isDebugEnabled()) {
+						getLog().debug("target file already moved: " + linkFile.getAbsolutePath());
+					}
+					continue;
+				}
+				getLog().info("move fingerprinted resource: " + linkFile.getAbsolutePath() + " to: " + targetFilename.getAbsolutePath());
+				if (processedFiles.containsKey(linkFile.getAbsolutePath())) {
+					String pathWithinSource = linkFile.getAbsolutePath();
+					linkFile = new File(processedFiles.get(pathWithinSource));
+					processedFiles.put(pathWithinSource, targetFilename.getAbsolutePath());
+					try {
+						copy(new FileInputStream(linkFile), new FileOutputStream(targetFilename), 2048);
+					} catch (Exception e) {
+						throw new MojoExecutionException("unable to copy resource file: " + linkFile + " to: " + targetFilename, e);
+					}
+					if (!linkFile.delete()) {
+						getLog().warn("unable to move " + linkFile.getAbsolutePath());
+					}
+				} else {
+					processedFiles.put(linkFile.getAbsolutePath(), targetFilename.getAbsolutePath());
+					try {
+						copy(new FileInputStream(linkFile), new FileOutputStream(targetFilename), 2048);
+					} catch (Exception e) {
+						throw new MojoExecutionException("unable to copy resource file: " + linkFile + " to: " + targetFilename, e);
+					}
+				}
 			}
 
 			String targetURL;
@@ -231,34 +273,6 @@ public class FingerprintMojo extends AbstractMojo {
 			}
 
 			m.appendReplacement(outputFileData, targetURL);
-			File targetFilename = new File(outputDirectory, targetPath);
-			if (targetFilename.exists()) {
-				if (getLog().isDebugEnabled()) {
-					getLog().debug("target file already moved: " + linkFile.getAbsolutePath());
-				}
-				continue;
-			}
-			getLog().info("move fingerprinted resource: " + linkFile.getAbsolutePath() + " to: " + targetFilename.getAbsolutePath());
-			if (processedFiles.containsKey(linkFile.getAbsolutePath())) {
-				String pathWithinSource = linkFile.getAbsolutePath();
-				linkFile = new File(processedFiles.get(pathWithinSource));
-				processedFiles.put(pathWithinSource, targetFilename.getAbsolutePath());
-				try {
-					copy(new FileInputStream(linkFile), new FileOutputStream(targetFilename), 2048);
-				} catch (Exception e) {
-					throw new MojoExecutionException("unable to copy resource file: " + linkFile + " to: " + targetFilename, e);
-				}
-				if (!linkFile.delete()) {
-					getLog().warn("unable to move " + linkFile.getAbsolutePath());
-				}
-			} else {
-				processedFiles.put(linkFile.getAbsolutePath(), targetFilename.getAbsolutePath());
-				try {
-					copy(new FileInputStream(linkFile), new FileOutputStream(targetFilename), 2048);
-				} catch (Exception e) {
-					throw new MojoExecutionException("unable to copy resource file: " + linkFile + " to: " + targetFilename, e);
-				}
-			}
 		}
 		m.appendTail(outputFileData);
 		return outputFileData;
@@ -274,25 +288,6 @@ public class FingerprintMojo extends AbstractMojo {
 			}
 		}
 		return false;
-	}
-
-	private static String generateFingerprint(byte[] data) throws MojoExecutionException {
-		MessageDigest md5Alg;
-		try {
-			md5Alg = MessageDigest.getInstance("MD5");
-			md5Alg.reset();
-			byte[] digest = md5Alg.digest(data);
-			BigInteger result = new BigInteger(digest);
-			String resultStr = null;
-			if (result.signum() < 0) {
-				resultStr = result.negate().toString(16);
-			} else {
-				resultStr = result.toString(16);
-			}
-			return resultStr;
-		} catch (NoSuchAlgorithmException e) {
-			throw new MojoExecutionException("unable to generate fingerprint", e);
-		}
 	}
 
 	static String generateTargetResourceFilename(String fingerprint, String sourceFilename) {
@@ -366,30 +361,6 @@ public class FingerprintMojo extends AbstractMojo {
 			}
 		}
 		return builder.toString();
-	}
-
-	private byte[] readBinaryFile(File f) throws MojoExecutionException {
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		FileInputStream fis = null;
-		try {
-			fis = new FileInputStream(f);
-			byte[] buf = new byte[2048];
-			int bytesRead = -1;
-			while ((bytesRead = fis.read(buf)) != -1) {
-				baos.write(buf, 0, bytesRead);
-			}
-			return baos.toByteArray();
-		} catch (Exception e) {
-			throw new MojoExecutionException("unable to read file: " + f, e);
-		} finally {
-			if (fis != null) {
-				try {
-					fis.close();
-				} catch (IOException e) {
-					getLog().warn("unable to close file cursor: " + f, e);
-				}
-			}
-		}
 	}
 
 	private static void copy(InputStream inputStream, OutputStream outputStream, int bufferSize) throws IOException {

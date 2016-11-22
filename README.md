@@ -20,6 +20,7 @@ The following patterns are used to detect resources eligible for fingerprinting:
   * `"([^\\s]*?\\.js)"`
   * `<img.*?src="(.*?)".*?>`
   * `url\("(.*?)"\)`
+  * `(<c:url.*?value=\")(/{1}.*?)(\".*?>)`
 
 After fingerprinting it is safe to add max expires header. 
 
