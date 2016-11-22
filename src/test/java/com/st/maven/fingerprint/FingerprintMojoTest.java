@@ -40,7 +40,7 @@ public class FingerprintMojoTest {
 		sourceDirectoryField.set(fingerprintMojo, sourceDirectory);
 
 		File outputDirectory = new File("src/test/fingered-web");
-		Field outputDirectoryField = clazz.getDeclaredField("outputDirectory");
+		Field outputDirectoryField = clazz.getDeclaredField("targetDirectory");
 		outputDirectoryField.setAccessible(true);
 		outputDirectoryField.set(fingerprintMojo, outputDirectory);
 	}
@@ -111,43 +111,11 @@ public class FingerprintMojoTest {
 	}
 
 	@Test
-	public void testGenerateTargetResourceFilename() throws Exception {
-		String url1 = "/resources/css/global.css";
-		String processedUrl1 = FingerprintMojo.generateTargetResourceFilename("1234567890", url1);
-		assertEquals("/resources/css/1234567890global.css", processedUrl1);
-	}
-
-	@Test
 	public void testGenerateTargetFilename() throws Exception {
 		File file = new File("src/test/resources/dummy-file-for-testing.txt");
 		File sourceDirectory = new File("src/test/resources/");
-		String targetHtmlFilename = FingerprintMojo.generateTargetFilename(sourceDirectory, file);
+		String targetHtmlFilename = FingerprintMojo.stripSourceDirectory(sourceDirectory, file);
 		assertEquals("/dummy-file-for-testing.txt", targetHtmlFilename);
 	}
 
-	@Test
-	public void testFindPagesToFilter() throws Exception {
-		File directory = new File("src/test/resources");
-		List<File> files = new ArrayList<File>();
-		fingerprintMojo.findPagesToFilter(files, directory);
-		File expectedFile = new File("src/test/resources/dummy-file-for-testing.txt");
-		List<File> expectedFiles = new ArrayList<File>();
-		expectedFiles.add(expectedFile);
-		assertEquals(expectedFiles, files);
-	}
-
-	@Test
-	public void testGetExtension() throws Exception {
-		String filename1 = "/src/test/resources/dummy-file-for-testing.txt";
-		String filenameExtension = FingerprintMojo.getExtension(filename1);
-		assertEquals("txt", filenameExtension);
-
-		String filename2 = "dummy-file-for-testing.txt";
-		filenameExtension = FingerprintMojo.getExtension(filename2);
-		assertEquals("txt", filenameExtension);
-
-		String filename3 = "dummy-file-for-testing";
-		filenameExtension = FingerprintMojo.getExtension(filename3);
-		assertEquals(null, filenameExtension);
-	}
 }
