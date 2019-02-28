@@ -1,4 +1,4 @@
 #!/bin/sh
 
-mvn release:clean release:prepare
-mvn release:perform
+mvn -P release release:clean release:prepare
+mvn -P release release:perform

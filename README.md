@@ -1,4 +1,4 @@
-fingerprint-maven-plugin
+fingerprint-maven-plugin [![Build Status](https://travis-ci.org/dernasherbrezon/fingerprint-maven-plugin.svg?branch=master)](https://travis-ci.org/dernasherbrezon/fingerprint-maven-plugin) [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=com.aerse.maven%3Afingerprint-maven-plugin&metric=alert_status)](https://sonarcloud.io/dashboard?id=com.aerse.maven%3Afingerprint-maven-plugin)
 ========================
 
 Maven plugin for web resources optimization
