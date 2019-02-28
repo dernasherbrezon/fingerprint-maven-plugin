@@ -7,17 +7,17 @@ import java.util.regex.Pattern;
 
 class HtmlMinifier {
 
-	private final static Pattern newLineSymbols = Pattern.compile("[\n\t\r]");
-	private final static Pattern tagWhiteSpaces = Pattern.compile(">(\\s+)<");
-	private final static String PRE_START_TAG = "<pre";
-	private final static String PRE_END_TAG = "</pre>";
-	private final static Pattern DEFAULT_INPUT_TYPE = Pattern.compile("(<input.*?) type=\"text\"");
+	private static final Pattern NEW_LINE_SYMBOLS = Pattern.compile("[\n\t\r]");
+	private static final Pattern TAG_WHITESPACES = Pattern.compile(">(\\s+)<");
+	private static final String PRE_START_TAG = "<pre";
+	private static final String PRE_END_TAG = "</pre>";
+	private static final Pattern DEFAULT_INPUT_TYPE = Pattern.compile("(<input.*?) type=\"text\"");
 
 	static String minify(String page) {
 		Matcher m = DEFAULT_INPUT_TYPE.matcher(page);
-		
+
 		StringBuffer sb = new StringBuffer();
-		while( m.find() ) {
+		while (m.find()) {
 			m.appendReplacement(sb, "$1");
 		}
 		m.appendTail(sb);
@@ -25,7 +25,7 @@ class HtmlMinifier {
 		if (!page.contains(PRE_START_TAG)) {
 			return fix(page);
 		}
-		
+
 		StringBuilder b = new StringBuilder();
 		List<String> parts = getParts(0, page);
 		for (String curPart : parts) {
@@ -39,13 +39,13 @@ class HtmlMinifier {
 	}
 
 	private static String fix(String original) {
-		String page = newLineSymbols.matcher(original).replaceAll("");
-		String result = tagWhiteSpaces.matcher(page).replaceAll("><");
+		String page = NEW_LINE_SYMBOLS.matcher(original).replaceAll("");
+		String result = TAG_WHITESPACES.matcher(page).replaceAll("><");
 		return result.trim();
 	}
 
 	private static List<String> getParts(int curStart, String original) {
-		List<String> result = new ArrayList<String>();
+		List<String> result = new ArrayList<>();
 		int start = original.indexOf(PRE_START_TAG, curStart);
 		if (start == -1) {
 			result.add(original.substring(curStart));
@@ -60,4 +60,7 @@ class HtmlMinifier {
 		return result;
 	}
 
+	private HtmlMinifier() {
+		// do nothing
+	}
 }

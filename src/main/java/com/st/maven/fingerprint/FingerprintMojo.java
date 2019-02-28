@@ -29,18 +29,14 @@ import org.apache.maven.plugins.annotations.Parameter;
 public class FingerprintMojo extends AbstractMojo {
 
 	/*
-	 * All resources should have absolute paths: Valid: <img
-	 * src="/img/test.png"> . Invalid: <img src="test.png"> All resources should
-	 * point to existing files without any pre-processing: Valid: <img
-	 * src="/img/test.png"> . Invalid: <img
-	 * src="<c:if test="${var}">/img/test.png</c:if>"
+	 * All resources should have absolute paths: Valid: <img src="/img/test.png"> . Invalid: <img src="test.png"> All resources should point to existing files without any pre-processing: Valid: <img src="/img/test.png"> . Invalid: <img src="<c:if test="${var}">/img/test.png</c:if>"
 	 */
-	public Pattern LINK_PATTERN = Pattern.compile("(<link.*?href=\")(.*?)(\".*?>)");
-	public Pattern SCRIPT_PATTERN = Pattern.compile("(\")([^\\s]*?\\.js)(\")");
-	public Pattern IMG_PATTERN = Pattern.compile("(<img.*?src=\")([^\\}\\{]*?)(\".*?>)");
-	public Pattern CSS_IMG_PATTERN = Pattern.compile("(url\\([\",'])(.*?)([\",']\\))");
-	public Pattern JSTL_URL_PATTERN = Pattern.compile("(<c:url.*?value=\")(/{1}.*?)(\".*?>)");
-	public Pattern DOLLAR_SIGN = Pattern.compile("\\$");
+	public static final Pattern LINK_PATTERN = Pattern.compile("(<link.*?href=\")(.*?)(\".*?>)");
+	public static final Pattern SCRIPT_PATTERN = Pattern.compile("(\")([^\\s]*?\\.js)(\")");
+	public static final Pattern IMG_PATTERN = Pattern.compile("(<img.*?src=\")([^\\}\\{]*?)(\".*?>)");
+	public static final Pattern CSS_IMG_PATTERN = Pattern.compile("(url\\([\",'])(.*?)([\",']\\))");
+	public static final Pattern JSTL_URL_PATTERN = Pattern.compile("(<c:url.*?value=\")(/{1}.*?)(\".*?>)");
+	public static final Pattern DOLLAR_SIGN = Pattern.compile("\\$");
 
 	/**
 	 * target directory
@@ -72,18 +68,16 @@ public class FingerprintMojo extends AbstractMojo {
 	@Parameter
 	private String cdn;
 
-	private final Set<String> processedFiles = new HashSet<String>();
-	private final Map<String, String> sourceToFingerprintedTarget = new HashMap<String, String>();
+	private final Set<String> processedFiles = new HashSet<>();
+	private final Map<String, String> sourceToFingerprintedTarget = new HashMap<>();
 
 	@Override
 	public void execute() throws MojoExecutionException {
 		if (!sourceDirectory.isDirectory()) {
 			throw new MojoExecutionException("source directory is not a directory: " + sourceDirectory.getAbsolutePath());
 		}
-		if (!targetDirectory.exists()) {
-			if (!targetDirectory.mkdirs()) {
-				throw new MojoExecutionException("unable to create outputdirectory: " + targetDirectory.getAbsolutePath());
-			}
+		if (!targetDirectory.exists() && !targetDirectory.mkdirs()) {
+			throw new MojoExecutionException("unable to create outputdirectory: " + targetDirectory.getAbsolutePath());
 		}
 		if (!targetDirectory.isDirectory()) {
 			throw new MojoExecutionException("output directory is not a directory: " + targetDirectory.getAbsolutePath());
@@ -92,7 +86,7 @@ public class FingerprintMojo extends AbstractMojo {
 			getLog().info("no files to optimize found");
 			return;
 		}
-		List<File> filesToOptimize = new ArrayList<File>();
+		List<File> filesToOptimize = new ArrayList<>();
 		findFilesToOptimize(filesToOptimize, sourceDirectory);
 		if (filesToOptimize.isEmpty()) {
 			getLog().info("no files to optimize were found");
@@ -156,15 +150,11 @@ public class FingerprintMojo extends AbstractMojo {
 			processedData = outputFileData.toString();
 		}
 
-		FileWriter w = null;
 		File targetFile = new File(targetDirectory, stripSourceDirectory(sourceDirectory, sourceFile));
-		try {
-			w = new FileWriter(targetFile);
+		try (FileWriter w = new FileWriter(targetFile)) {
 			IOUtils.write(processedData, w);
 		} catch (IOException e) {
 			throw new MojoExecutionException("unable to file: " + targetFile.getAbsolutePath(), e);
-		} finally {
-			IOUtils.closeQuietly(w);
 		}
 	}
 
@@ -183,13 +173,13 @@ public class FingerprintMojo extends AbstractMojo {
 				m.appendReplacement(outputFileData, "$1" + curLink + "$3");
 				continue;
 			}
-			int queryIndex = curLink.indexOf("?");
+			int queryIndex = curLink.indexOf('?');
 			String query = "";
 			if (queryIndex != -1) {
 				query = curLink.substring(queryIndex);
 				curLink = curLink.substring(0, queryIndex);
 			} else {
-				queryIndex = curLink.indexOf("#");
+				queryIndex = curLink.indexOf('#');
 				if (queryIndex != -1) {
 					query = curLink.substring(queryIndex);
 					curLink = curLink.substring(0, queryIndex);
@@ -246,16 +236,12 @@ public class FingerprintMojo extends AbstractMojo {
 
 	static String generateTargetResourceFilename(File sourceFile, String sourceFilename) throws MojoExecutionException {
 		String fingerprint;
-		FileInputStream fis = null;
-		try {
-			fis = new FileInputStream(sourceFile);
+		try (FileInputStream fis = new FileInputStream(sourceFile)) {
 			fingerprint = DigestUtils.md5Hex(fis);
 		} catch (Exception e1) {
 			throw new MojoExecutionException("unable to calculate md5 for file: " + sourceFile.getAbsolutePath(), e1);
-		} finally {
-			IOUtils.closeQuietly(fis);
 		}
-		int index = sourceFilename.lastIndexOf("/");
+		int index = sourceFilename.lastIndexOf('/');
 		if (index == -1) {
 			return fingerprint + sourceFilename;
 		}
@@ -306,14 +292,10 @@ public class FingerprintMojo extends AbstractMojo {
 	}
 
 	private static String readFile(File file) throws MojoExecutionException {
-		FileReader r = null;
-		try {
-			r = new FileReader(file);
+		try (FileReader r = new FileReader(file)) {
 			return IOUtils.toString(r);
 		} catch (Exception e) {
 			throw new MojoExecutionException("unable to read file: " + file.getAbsolutePath(), e);
-		} finally {
-			IOUtils.closeQuietly(r);
 		}
 	}
 
@@ -345,7 +327,7 @@ public class FingerprintMojo extends AbstractMojo {
 	}
 
 	private static String getExtension(String filename) {
-		int extensionIndex = filename.lastIndexOf(".");
+		int extensionIndex = filename.lastIndexOf('.');
 		if (extensionIndex == -1) {
 			return null;
 		}

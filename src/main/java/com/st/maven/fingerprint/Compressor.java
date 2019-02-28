@@ -42,10 +42,11 @@ class Compressor {
 					return new EvaluatorException(message);
 				}
 			});
-			StringWriter w = new StringWriter();
-			compressor.compress(w, -1, true, true, false, false);
-			w.flush();
-			return w.toString();
+			try (StringWriter w = new StringWriter()) {
+				compressor.compress(w, -1, true, true, false, false);
+				w.flush();
+				return w.toString();
+			}
 		} catch (Exception e) {
 			throw new RuntimeException("unable to process", e);
 		} finally {
@@ -66,10 +67,11 @@ class Compressor {
 		CssCompressor compressor;
 		try {
 			compressor = new CssCompressor(in);
-			StringWriter w = new StringWriter();
-			compressor.compress(w, -1);
-			w.flush();
-			return w.toString();
+			try (StringWriter w = new StringWriter()) {
+				compressor.compress(w, -1);
+				w.flush();
+				return w.toString();
+			}
 		} catch (Exception e) {
 			throw new RuntimeException("Unable to process", e);
 		} finally {
@@ -84,4 +86,7 @@ class Compressor {
 		}
 	}
 
+	private Compressor() {
+		//do nothing
+	}
 }

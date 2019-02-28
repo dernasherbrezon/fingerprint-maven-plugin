@@ -1,73 +1,36 @@
 package com.st.maven.fingerprint;
 
-import org.junit.Before;
-import org.junit.Test;
-
-import com.st.maven.fingerprint.FingerprintMojo;
-
-import java.io.File;
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-/**
- * @author Richard Scott Smith <scott.smith@isostech.com>
- */
+import java.io.File;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import org.junit.Test;
+
 public class FingerprintMojoTest {
-	FingerprintMojo fingerprintMojo;
 
-	@Before
-	public void setUp() throws Exception {
-		fingerprintMojo = new FingerprintMojo();
-
-		// Configure the instance
-		List<String> extensionsToFilter = new ArrayList<String>();
-		extensionsToFilter.add("txt");
-		Class<FingerprintMojo> clazz = FingerprintMojo.class;
-		Field extensionsToFilterField = clazz.getDeclaredField("extensionsToFilter");
-		extensionsToFilterField.setAccessible(true);
-		extensionsToFilterField.set(fingerprintMojo, extensionsToFilter);
-
-		File sourceDirectory = new File("src/test/resources");
-		Field sourceDirectoryField = clazz.getDeclaredField("sourceDirectory");
-		sourceDirectoryField.setAccessible(true);
-		sourceDirectoryField.set(fingerprintMojo, sourceDirectory);
-
-		File outputDirectory = new File("src/test/fingered-web");
-		Field outputDirectoryField = clazz.getDeclaredField("targetDirectory");
-		outputDirectoryField.setAccessible(true);
-		outputDirectoryField.set(fingerprintMojo, outputDirectory);
-	}
-
-	/**
-	 * Testing of the various regex patterns.
-	 * @throws Exception
-	 */
 	@Test
 	public void testPattern() throws Exception {
-		Pattern linkPattern = fingerprintMojo.LINK_PATTERN;
+		Pattern linkPattern = FingerprintMojo.LINK_PATTERN;
 		String linkUrl = "<link rel=\"stylesheet\" href=\"${pageContext.request.contextPath}/resources/css/style.css\" />";
 		Matcher linkMatcher = linkPattern.matcher(linkUrl);
 		assertTrue(linkMatcher.find());
 
-		Pattern scriptPattern = fingerprintMojo.SCRIPT_PATTERN;
+		Pattern scriptPattern = FingerprintMojo.SCRIPT_PATTERN;
 		String scriptUrl = "<script src=\"${pageContext.request.contextPath}/resources/js/vendor/zepto.js\">";
 		Matcher scriptMatcher = scriptPattern.matcher(scriptUrl);
 		assertTrue(scriptMatcher.find());
 
-		Pattern imgPattern = fingerprintMojo.IMG_PATTERN;
+		Pattern imgPattern = FingerprintMojo.IMG_PATTERN;
 		String imageUrl = "<img src=\"${pageContext.request.contextPath}/images/favicon-whatever.ico\" />";
 		Matcher imgMatcher = imgPattern.matcher(imageUrl);
 		assertFalse(imgMatcher.find());
 
 		// Tests for the CSS image references
-		Pattern cssPattern = fingerprintMojo.CSS_IMG_PATTERN;
+		Pattern cssPattern = FingerprintMojo.CSS_IMG_PATTERN;
 		// Double quotes url, absolute location
 		String cssUrl1 = "url(\"/images/navigation-s66728e073e.png\")";
 		Matcher cssMatcher1 = cssPattern.matcher(cssUrl1);
@@ -89,7 +52,7 @@ public class FingerprintMojoTest {
 		assertTrue(cssMatcher4.find());
 
 		// JSTL url, absolute
-		Pattern jstlUrlPattern = fingerprintMojo.JSTL_URL_PATTERN;
+		Pattern jstlUrlPattern = FingerprintMojo.JSTL_URL_PATTERN;
 		String jstlUrl1 = "<c:url value=\"/resources/images/favicon.ico\" var=\"faviconUrl\"/>";
 		Matcher jstlUrlMatcher1 = jstlUrlPattern.matcher(jstlUrl1);
 		assertTrue(jstlUrlMatcher1.find());
@@ -103,11 +66,6 @@ public class FingerprintMojoTest {
 		String jstlUrl3 = "<c:url value=\"http://www.fedex.com/Tracking?ascend_header=1&amp;clienttype=dotcom&amp;cntry_code=us&amp;language=english&amp;tracknumbers=${shipment.trackingNumber}\" var=\"fedexUrl\"/>";
 		Matcher jstlUrlMatcher3 = jstlUrlPattern.matcher(jstlUrl3);
 		assertFalse(jstlUrlMatcher3.find());
-	}
-
-	@Test
-	public void testExecute() throws Exception {
-		fingerprintMojo.execute();
 	}
 
 	@Test
