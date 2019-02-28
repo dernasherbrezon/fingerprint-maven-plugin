@@ -297,13 +297,9 @@ public class FingerprintMojo extends AbstractMojo {
 				continue;
 			}
 
-			FileInputStream fis = null;
-			FileOutputStream fos = null;
-			try {
-				fis = new FileInputStream(curFile);
-				fos = new FileOutputStream(new File(dstDir, curFile.getName()));
+			try (FileInputStream fis = new FileInputStream(curFile); FileOutputStream fos = new FileOutputStream(new File(dstDir, curFile.getName()))) {
 				IOUtils.copy(fis, fos);
-			} catch (Exception e) {
+			} catch (IOException e) {
 				throw new MojoExecutionException("unable to copy", e);
 			}
 		}
