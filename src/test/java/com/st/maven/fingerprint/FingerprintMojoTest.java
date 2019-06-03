@@ -73,7 +73,38 @@ public class FingerprintMojoTest {
 		File file = new File("src/test/resources/dummy-file-for-testing.txt");
 		File sourceDirectory = new File("src/test/resources/");
 		String targetHtmlFilename = FingerprintMojo.stripSourceDirectory(sourceDirectory, file);
-		assertEquals("/dummy-file-for-testing.txt", targetHtmlFilename);
+		assertEquals(String.format("%sdummy-file-for-testing.txt", File.separator) , targetHtmlFilename);
 	}
 
+	@Test
+	public void testGenerateFilenameWithDefaultPattern() throws Exception {
+		String defaultPattern ="[hash][name].[ext]";
+		File file = new File("src/test/resources/dummy-file-for-testing.txt");
+		String resultFilename = FingerprintMojo.generateTargetResourceFilename(file, "dummy-file-for-testing.txt", defaultPattern);
+		assertEquals(resultFilename, "331afe01c54815562adc514c6b5eb561dummy-file-for-testing.txt");
+	}
+
+	@Test
+	public void testGenerateFilenameWithCustomPattern() throws Exception {
+		String namePattern = "[hash].[name].[ext]";
+		File file = new File("src/test/resources/dummy-file-for-testing.txt");
+		String resultFilename = FingerprintMojo.generateTargetResourceFilename(file, "dummy-file-for-testing.txt", namePattern);
+		assertEquals(resultFilename, "331afe01c54815562adc514c6b5eb561.dummy-file-for-testing.txt");
+	}
+
+	@Test
+	public void testGenerateFilenameWithAnotherCustomPattern() throws Exception {
+		String namePattern = "[name].[ext]?hash=[hash]";
+		File file = new File("src/test/resources/dummy-file-for-testing.txt");
+		String resultFilename = FingerprintMojo.generateTargetResourceFilename(file, "dummy-file-for-testing.txt", namePattern);
+		assertEquals(resultFilename, "dummy-file-for-testing.txt?hash=331afe01c54815562adc514c6b5eb561");
+	}
+
+	@Test
+	public void testGenerateFilenameWithUnsupportedParameterInCustomPattern() throws Exception {
+		String namePattern = "[name].[hash].[ext][sv]";
+		File file = new File("src/test/resources/dummy-file-for-testing.txt");
+		String resultFilename = FingerprintMojo.generateTargetResourceFilename(file, "dummy-file-for-testing.txt", namePattern);
+		assertEquals(resultFilename, "dummy-file-for-testing.331afe01c54815562adc514c6b5eb561.txt[sv]");
+	}
 }
