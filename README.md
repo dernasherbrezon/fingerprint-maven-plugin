@@ -82,6 +82,8 @@ Configuration
 					</extensionsToFilter>
 <!-- cdn host. Not required. For example using "//accountname.r.worldssl.net": /css/bootstrap.css -> //accountname.r.worldssl.net/css/<md5>bootstrap.css -->
 					<cdn>${cdn}</cdn>
+<!-- fingerprinted filename. Could be [name].[ext]?hash=[hash] -->
+					<namePattern>[hash][name].[ext]</namePattern>
 				</configuration>
 			</plugin>
 ```
