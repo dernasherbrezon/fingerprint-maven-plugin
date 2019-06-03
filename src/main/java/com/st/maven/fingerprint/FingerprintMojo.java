@@ -18,7 +18,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.text.StrSubstitutor;
+import org.apache.commons.text.StringSubstitutor;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
@@ -61,6 +64,9 @@ public class FingerprintMojo extends AbstractMojo {
 
 	@Parameter
 	private Set<String> htmlExtensions;
+
+	@Parameter(defaultValue = "[hash][name].[ext]")
+	private String namePattern;
 
 	/**
 	 * CDN url
@@ -197,7 +203,7 @@ public class FingerprintMojo extends AbstractMojo {
 					continue;
 				}
 				logIfRelativePath(curLink);
-				targetPath = generateTargetResourceFilename(curLinkFile, curLink);
+				targetPath = generateTargetResourceFilename(curLinkFile, curLink, namePattern);
 				logIfRelativePath(targetPath);
 
 				sourceToFingerprintedTarget.put(curLink, targetPath);
@@ -234,19 +240,23 @@ public class FingerprintMojo extends AbstractMojo {
 		return false;
 	}
 
-	static String generateTargetResourceFilename(File sourceFile, String sourceFilename) throws MojoExecutionException {
+	static String generateTargetResourceFilename(File sourceFile, String sourceFilename, String namePattern) throws MojoExecutionException {
 		String fingerprint;
 		try (FileInputStream fis = new FileInputStream(sourceFile)) {
 			fingerprint = DigestUtils.md5Hex(fis);
 		} catch (Exception e1) {
 			throw new MojoExecutionException("unable to calculate md5 for file: " + sourceFile.getAbsolutePath(), e1);
 		}
-		int index = sourceFilename.lastIndexOf('/');
-		if (index == -1) {
-			return fingerprint + sourceFilename;
-		}
-		String filename = sourceFilename.substring(index + 1);
-		return sourceFilename.substring(0, index) + "/" + fingerprint + filename;
+		String filename = FilenameUtils.getBaseName(sourceFilename);
+		String extension = FilenameUtils.getExtension(sourceFilename);
+
+		Map<String, String> values = new HashMap<>();
+		values.put("name", filename);
+		values.put("hash", fingerprint);
+		values.put("ext", extension);
+
+		StringSubstitutor sub = new StringSubstitutor(values, "[", "]");
+		return sub.replace(namePattern);
 	}
 
 	static String stripSourceDirectory(File sourceDirectory, File file) {
