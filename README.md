@@ -48,7 +48,7 @@ Configuration
 			<plugin>
 				<groupId>com.aerse.maven</groupId>
 				<artifactId>fingerprint-maven-plugin</artifactId>
-				<version>3.3</version>
+				<version>3.6</version>
 				<executions>
 					<execution>
 						<phase>package</phase>
