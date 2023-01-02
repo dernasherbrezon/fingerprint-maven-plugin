@@ -20,7 +20,6 @@ import java.util.regex.Pattern;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.text.StrSubstitutor;
 import org.apache.commons.text.StringSubstitutor;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -36,9 +35,9 @@ public class FingerprintMojo extends AbstractMojo {
 	 */
 	public static final Pattern LINK_PATTERN = Pattern.compile("(<link[^>]+href=\")(.*?)(\"[^>]*>)");
 	public static final Pattern SCRIPT_PATTERN = Pattern.compile("(\")([^\\s]*?\\.js)(\")");
-	public static final Pattern IMG_PATTERN = Pattern.compile("(<img.*?src=\")([^\\}\\{]*?)(\".*?>)");
-	public static final Pattern CSS_IMG_PATTERN = Pattern.compile("(url\\([\",'])(.*?)([\",']\\))");
-	public static final Pattern JSTL_URL_PATTERN = Pattern.compile("(<c:url.*?value=\")(/{1}.*?)(\".*?>)");
+	public static final Pattern IMG_PATTERN = Pattern.compile("(<img[^>]+src=\")([^\\}\\{]*?)(\"[^>]+>)");
+	public static final Pattern CSS_URL_PATTERN = Pattern.compile("(url\\(\\s*[\"']?)(.*?)([\"']?\\s*\\))");
+	public static final Pattern JSTL_URL_PATTERN = Pattern.compile("(<c:url[^>]+value=\")(/{1}.*?)(\"[^>]+>)");
 	public static final Pattern DOLLAR_SIGN = Pattern.compile("\\$");
 
 	/**
@@ -140,7 +139,7 @@ public class FingerprintMojo extends AbstractMojo {
 		outputFileData = processPattern(LINK_PATTERN, outputFileData.toString(), sourceFile.getAbsolutePath());
 		outputFileData = processPattern(SCRIPT_PATTERN, outputFileData.toString(), sourceFile.getAbsolutePath());
 		outputFileData = processPattern(IMG_PATTERN, outputFileData.toString(), sourceFile.getAbsolutePath());
-		outputFileData = processPattern(CSS_IMG_PATTERN, outputFileData.toString(), sourceFile.getAbsolutePath());
+		outputFileData = processPattern(CSS_URL_PATTERN, outputFileData.toString(), sourceFile.getAbsolutePath());
 		outputFileData = processPattern(JSTL_URL_PATTERN, outputFileData.toString(), sourceFile.getAbsolutePath());
 		String processedData = null;
 		if (htmlExtensions != null && !htmlExtensions.isEmpty()) {

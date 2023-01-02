@@ -29,31 +29,49 @@ public class FingerprintMojoTest {
 		assertTrue(scriptMatcher.find());
 
 		Pattern imgPattern = FingerprintMojo.IMG_PATTERN;
-		String imageUrl = "<img src=\"${pageContext.request.contextPath}/images/favicon-whatever.ico\" />";
-		Matcher imgMatcher = imgPattern.matcher(imageUrl);
-		assertFalse(imgMatcher.find());
+		String imageUrl1 = "<img src=\"${pageContext.request.contextPath}/images/favicon-whatever.ico\" />";
+		Matcher imgMatcher1 = imgPattern.matcher(imageUrl1);
+		assertFalse(imgMatcher1.find());
+
+		String imageUrl2 = "<img src=\"/images/photo.jpg\" />";
+		Matcher imgMatcher2 = imgPattern.matcher(imageUrl2);
+		assertTrue(imgMatcher2.find());
+
+		String imageUrl3 = "<img\n    src=\"/images/photo.jpg\"\n    />";
+		Matcher imgMatcher3 = imgPattern.matcher(imageUrl3);
+		assertTrue(imgMatcher3.find());
 
 		// Tests for the CSS image references
-		Pattern cssPattern = FingerprintMojo.CSS_IMG_PATTERN;
-		// Double quotes url, absolute location
-		String cssUrl1 = "url(\"/images/navigation-s66728e073e.png\")";
+		Pattern cssPattern = FingerprintMojo.CSS_URL_PATTERN;
+		// Double-quoted url, absolute location
+		String cssUrl1 = "url( \"/images/navigation-s66728e073e.png\" )";
 		Matcher cssMatcher1 = cssPattern.matcher(cssUrl1);
 		assertTrue(cssMatcher1.find());
 
-		// Single quotes url, absolute location
-		String cssUrl2 = "url('/images/navigation-s66728e073e.png')";
+		// Single-quoted url, absolute location
+		String cssUrl2 = "url( '/images/navigation-s66728e073e.png' )";
 		Matcher cssMatcher2 = cssPattern.matcher(cssUrl2);
 		assertTrue(cssMatcher2.find());
 
-		// Double quotes url, relative location
-		String cssUrl3 = "url(\"../images/navigation-s66728e073e.png\")";
+		// Unquoted url, absolute location
+		String cssUrl3 = "url( /images/navigation-s66728e073e.png )";
 		Matcher cssMatcher3 = cssPattern.matcher(cssUrl3);
 		assertTrue(cssMatcher3.find());
 
-		// Double quotes url, relative location
-		String cssUrl4 = "url('../images/navigation-s66728e073e.png')";
+		// Double-quoted url, relative location
+		String cssUrl4 = "url( \"../images/navigation-s66728e073e.png\" )";
 		Matcher cssMatcher4 = cssPattern.matcher(cssUrl4);
 		assertTrue(cssMatcher4.find());
+
+		// Single-quoted url, relative location
+		String cssUrl5 = "url( '../images/navigation-s66728e073e.png' )";
+		Matcher cssMatcher5 = cssPattern.matcher(cssUrl5);
+		assertTrue(cssMatcher5.find());
+
+		// Unquoted url, relative location
+		String cssUrl6 = "url( ../images/navigation-s66728e073e.png )";
+		Matcher cssMatcher6 = cssPattern.matcher(cssUrl6);
+		assertTrue(cssMatcher6.find());
 
 		// JSTL url, absolute
 		Pattern jstlUrlPattern = FingerprintMojo.JSTL_URL_PATTERN;
@@ -70,6 +88,12 @@ public class FingerprintMojoTest {
 		String jstlUrl3 = "<c:url value=\"http://www.fedex.com/Tracking?ascend_header=1&amp;clienttype=dotcom&amp;cntry_code=us&amp;language=english&amp;tracknumbers=${shipment.trackingNumber}\" var=\"fedexUrl\"/>";
 		Matcher jstlUrlMatcher3 = jstlUrlPattern.matcher(jstlUrl3);
 		assertFalse(jstlUrlMatcher3.find());
+
+		// Multiline JSTL url, absolute
+		String jstlUrl4 = "<c:url\n    value=\"/resources/images/favicon.ico\"\n    var=\"faviconUrl\"\n    />";
+		Matcher jstlUrlMatcher4 = jstlUrlPattern.matcher(jstlUrl4);
+		assertTrue(jstlUrlMatcher4.find());
+
 	}
 
 	@Test
