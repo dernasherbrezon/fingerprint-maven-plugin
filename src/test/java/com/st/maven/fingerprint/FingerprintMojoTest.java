@@ -19,6 +19,10 @@ public class FingerprintMojoTest {
 		Matcher linkMatcher = linkPattern.matcher(linkUrl);
 		assertTrue(linkMatcher.find());
 
+		String multilineLinkUrl = "<link\n    rel=\"stylesheet\"\n    href=\"${pageContext.request.contextPath}/resources/css/style.css\" />";
+		Matcher multilineLinkMatcher = linkPattern.matcher(multilineLinkUrl);
+		assertTrue(multilineLinkMatcher.find());
+
 		Pattern scriptPattern = FingerprintMojo.SCRIPT_PATTERN;
 		String scriptUrl = "<script src=\"${pageContext.request.contextPath}/resources/js/vendor/zepto.js\">";
 		Matcher scriptMatcher = scriptPattern.matcher(scriptUrl);
