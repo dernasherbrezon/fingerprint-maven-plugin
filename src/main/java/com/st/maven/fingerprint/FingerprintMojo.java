@@ -63,7 +63,16 @@ public class FingerprintMojo extends AbstractMojo {
 	private List<String> extensionsToFilter;
 
 	@Parameter
+	private boolean minifyHtml = true;
+
+	@Parameter
 	private Set<String> htmlExtensions;
+
+	@Parameter
+	private boolean minifyJs = true;
+
+	@Parameter
+	private boolean minifyCss = true;
 
 	@Parameter(defaultValue = "[hash][name].[ext]")
 	private String namePattern;
@@ -136,17 +145,17 @@ public class FingerprintMojo extends AbstractMojo {
 		String processedData = null;
 		if (htmlExtensions != null && !htmlExtensions.isEmpty()) {
 			String extension = getExtension(sourceFile.getName());
-			if (extension != null && htmlExtensions.contains(extension)) {
+			if (extension != null && htmlExtensions.contains(extension) && minifyHtml) {
 				getLog().info("minifying html: " + sourceFile.getAbsolutePath());
 				processedData = HtmlMinifier.minify(outputFileData.toString());
 			}
 		} else if (sourceFile.getName().contains(".min.")) {
 			getLog().info("ignoring already minified resource: " + sourceFile.getAbsolutePath());
-		} else if (sourceFile.getName().endsWith(".js")) {
+		} else if (sourceFile.getName().endsWith(".js") && minifyJs) {
 			processedData = outputFileData.toString();
 			getLog().info("minifying javascript: " + sourceFile.getAbsolutePath());
 			processedData = Compressor.compressJavaScript(new StringReader(processedData), getLog());
-		} else if (sourceFile.getName().endsWith(".css")) {
+		} else if (sourceFile.getName().endsWith(".css") && minifyCss) {
 			processedData = outputFileData.toString();
 			getLog().info("minifying css: " + sourceFile.getAbsolutePath());
 			processedData = Compressor.compressCSS(new StringReader(processedData), getLog());

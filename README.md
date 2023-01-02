@@ -67,6 +67,10 @@ Configuration
 					<sourceDirectory>${basedir}/target/webcombined</sourceDirectory>
 <!-- ${project.build.directory}/optimized-webapp by default -->
 					<targetDirectory>${basedir}/target/optimized-webapp</targetDirectory>
+<!-- Optional: set to 'false' to disable minification of HTML, JS and/or CSS. -->
+					<minifyHtml>true</minifyHtml>
+					<minifyJs>true</minifyJs>
+					<minifyCss>true</minifyCss>
 <!-- Remove unnecessary spaces between tags. Make single line page. Takes into consideration <pre> tags -->
 					<htmlExtensions>
 						<htmlExtension>html</htmlExtension>
@@ -96,4 +100,3 @@ Configuration
             add_header Cache-Control public;
         }
 ```
-
