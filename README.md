@@ -16,11 +16,11 @@ This plugin performs several optimizations:
 During this process plugin calculates file checksum and prepends it to the file name. All links to this filename will be changed to the fingerprinted version. Original file will be deleted. Fingerprinting used to improve web resource caching. If file checksum is not changed, then the name will be the same and it is safe to add max expires header. Once file contents are changed, checksum will be changed as well. This plugin filters out (recursivly) source directory, detects any resources using the patterns below and copy result (if needed) to the target directory.
 
 The following patterns are used to detect resources eligible for fingerprinting:
-  * `<link.*?href="(.*?)".*?>`
-  * `"([^\\s]*?\\.js)"`
-  * `<img.*?src="(.*?)".*?>`
-  * `url\("(.*?)"\)`
-  * `(<c:url.*?value=\")(/{1}.*?)(\".*?>)`
+  * `<link[^>]+href="(.*?)"[^>]*>`
+  * `"([^\s]*?\.js)"`
+  * `<img[^>]+src="([^\}\{]*?)"[^>]+>`
+  * `url\(\s*["']?(.*?)["']?\s*\)`
+  * `<c:url[^>]+value="(/{1}.*?)"[^>]+>`
 
 After fingerprinting it is safe to add max expires header. 
 
