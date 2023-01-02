@@ -29,9 +29,13 @@ public class FingerprintMojoTest {
 		assertTrue(scriptMatcher.find());
 
 		Pattern imgPattern = FingerprintMojo.IMG_PATTERN;
-		String imageUrl = "<img src=\"${pageContext.request.contextPath}/images/favicon-whatever.ico\" />";
-		Matcher imgMatcher = imgPattern.matcher(imageUrl);
-		assertFalse(imgMatcher.find());
+		String imageUrl1 = "<img src=\"${pageContext.request.contextPath}/images/favicon-whatever.ico\" />";
+		Matcher imgMatcher1 = imgPattern.matcher(imageUrl1);
+		assertFalse(imgMatcher1.find());
+
+		String imageUrl2 = "<img src=\"/images/photo.jpg\" />";
+		Matcher imgMatcher2 = imgPattern.matcher(imageUrl2);
+		assertTrue(imgMatcher2.find());
 
 		// Tests for the CSS image references
 		Pattern cssPattern = FingerprintMojo.CSS_IMG_PATTERN;
