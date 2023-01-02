@@ -37,6 +37,10 @@ public class FingerprintMojoTest {
 		Matcher imgMatcher2 = imgPattern.matcher(imageUrl2);
 		assertTrue(imgMatcher2.find());
 
+		String imageUrl3 = "<img\n    src=\"/images/photo.jpg\"\n    />";
+		Matcher imgMatcher3 = imgPattern.matcher(imageUrl3);
+		assertTrue(imgMatcher3.find());
+
 		// Tests for the CSS image references
 		Pattern cssPattern = FingerprintMojo.CSS_IMG_PATTERN;
 		// Double quotes url, absolute location
