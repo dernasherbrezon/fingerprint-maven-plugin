@@ -38,7 +38,7 @@ public class FingerprintMojo extends AbstractMojo {
 	public static final Pattern SCRIPT_PATTERN = Pattern.compile("(\")([^\\s]*?\\.js)(\")");
 	public static final Pattern IMG_PATTERN = Pattern.compile("(<img[^>]+src=\")([^\\}\\{]*?)(\"[^>]+>)");
 	public static final Pattern CSS_URL_PATTERN = Pattern.compile("(url\\(\\s*[\"']?)(.*?)([\"']?\\s*\\))");
-	public static final Pattern JSTL_URL_PATTERN = Pattern.compile("(<c:url.*?value=\")(/{1}.*?)(\".*?>)");
+	public static final Pattern JSTL_URL_PATTERN = Pattern.compile("(<c:url[^>]+value=\")(/{1}.*?)(\"[^>]+>)");
 	public static final Pattern DOLLAR_SIGN = Pattern.compile("\\$");
 
 	/**

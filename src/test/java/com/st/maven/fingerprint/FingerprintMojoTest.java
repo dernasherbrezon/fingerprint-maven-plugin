@@ -88,6 +88,12 @@ public class FingerprintMojoTest {
 		String jstlUrl3 = "<c:url value=\"http://www.fedex.com/Tracking?ascend_header=1&amp;clienttype=dotcom&amp;cntry_code=us&amp;language=english&amp;tracknumbers=${shipment.trackingNumber}\" var=\"fedexUrl\"/>";
 		Matcher jstlUrlMatcher3 = jstlUrlPattern.matcher(jstlUrl3);
 		assertFalse(jstlUrlMatcher3.find());
+
+		// Multiline JSTL url, absolute
+		String jstlUrl4 = "<c:url\n    value=\"/resources/images/favicon.ico\"\n    var=\"faviconUrl\"\n    />";
+		Matcher jstlUrlMatcher4 = jstlUrlPattern.matcher(jstlUrl4);
+		assertTrue(jstlUrlMatcher4.find());
+
 	}
 
 	@Test
