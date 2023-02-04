@@ -11,6 +11,7 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<maven.version>3.6.0</maven.version>
 	</properties>
 
 	<dependencies>
@@ -37,17 +38,35 @@
 		<dependency>
 			<groupId>org.apache.maven</groupId>
 			<artifactId>maven-plugin-api</artifactId>
-			<version>3.0.5</version>
+			<version>${maven.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.maven.plugin-tools</groupId>
 			<artifactId>maven-plugin-annotations</artifactId>
-			<version>3.2</version>
+			<version>${maven.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>4.13.1</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.maven</groupId>
+			<artifactId>maven-compat</artifactId>
+			<version>${maven.version}</version>
+			<scope>test</scope>
+		</dependency>		
+		<dependency>
+			<groupId>org.apache.maven.plugin-testing</groupId>
+			<artifactId>maven-plugin-testing-harness</artifactId>
+			<version>3.3.0</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-log4j12</artifactId>
+			<version>1.7.25</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
@@ -82,18 +101,21 @@
 				<configuration>
 					<goalPrefix>fingerprint</goalPrefix>
 					<skipErrorNoDescriptorsFound>true</skipErrorNoDescriptorsFound>
-					<extractors>
-						<!-- We only need the java extractor and not the bsh one -->
-						<extractor>java-annotations</extractor>
-					</extractors>
 				</configuration>
 				<executions>
 					<execution>
-						<id>mojo-descriptor</id>
-						<phase>process-classes</phase>
+						<id>default-descriptor</id>
 						<goals>
 							<goal>descriptor</goal>
 						</goals>
+						<phase>process-classes</phase>
+					</execution>
+					<execution>
+						<id>help-descriptor</id>
+						<goals>
+							<goal>helpmojo</goal>
+						</goals>
+						<phase>process-classes</phase>
 					</execution>
 				</executions>
 			</plugin>

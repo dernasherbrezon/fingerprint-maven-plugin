@@ -31,11 +31,14 @@ import org.apache.maven.plugins.annotations.Parameter;
 public class FingerprintMojo extends AbstractMojo {
 
 	/*
-	 * All resources should have absolute paths: Valid: <img src="/img/test.png"> . Invalid: <img src="test.png"> All resources should point to existing files without any pre-processing: Valid: <img src="/img/test.png"> . Invalid: <img src="<c:if test="${var}">/img/test.png</c:if>"
+	 * All resources should have absolute paths: Valid: <img src="/img/test.png"> .
+	 * Invalid: <img src="test.png"> All resources should point to existing files
+	 * without any pre-processing: Valid: <img src="/img/test.png"> . Invalid: <img
+	 * src="<c:if test="${var}">/img/test.png</c:if>"
 	 */
-	public static final Pattern LINK_PATTERN = Pattern.compile("(<link[^>]+href=\")(.*?)(\"[^>]*>)");
-	public static final Pattern SCRIPT_PATTERN = Pattern.compile("(\")([^\\s]*?\\.js)(\")");
-	public static final Pattern IMG_PATTERN = Pattern.compile("(<img[^>]+src=\")([^\\}\\{]*?)(\"[^>]+>)");
+	public static final Pattern LINK_PATTERN = Pattern.compile("(<link[^>]+href=[\"'])(.*?)([\"'][^>]*>)");
+	public static final Pattern SCRIPT_PATTERN = Pattern.compile("([\"'])([^\\s]*?\\.js)([\"'])");
+	public static final Pattern IMG_PATTERN = Pattern.compile("(<img[^>]+src=[\"'])([^\\}\\{]*?)([\"'][^>]+>)");
 	public static final Pattern CSS_URL_PATTERN = Pattern.compile("(url\\(\\s*[\"']?)(.*?)([\"']?\\s*\\))");
 	public static final Pattern JSTL_URL_PATTERN = Pattern.compile("(<c:url[^>]+value=\")(/{1}.*?)(\"[^>]+>)");
 	public static final Pattern DOLLAR_SIGN = Pattern.compile("\\$");
@@ -264,7 +267,7 @@ public class FingerprintMojo extends AbstractMojo {
 		values.put("ext", extension);
 
 		StringSubstitutor sub = new StringSubstitutor(values, "[", "]");
-		return sub.replace(namePattern);
+		return FilenameUtils.getFullPath(sourceFilename) + sub.replace(namePattern);
 	}
 
 	static String stripSourceDirectory(File sourceDirectory, File file) {
