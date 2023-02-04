@@ -18,10 +18,7 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.text.StringSubstitutor;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
@@ -37,12 +34,12 @@ public class FingerprintMojo extends AbstractMojo {
 	 * without any pre-processing: Valid: <img src="/img/test.png"> . Invalid: <img
 	 * src="<c:if test="${var}">/img/test.png</c:if>"
 	 */
-	public static final Pattern LINK_PATTERN = Pattern.compile("(<link[^>]+href=[\"'])(.*?)([\"'][^>]*>)");
-	public static final Pattern SCRIPT_PATTERN = Pattern.compile("([\"'])([^\\s]*?\\.js)([\"'])");
-	public static final Pattern IMG_PATTERN = Pattern.compile("(<img[^>]+src=[\"'])([^\\}\\{]*?)([\"'][^>]+>)");
-	public static final Pattern CSS_URL_PATTERN = Pattern.compile("(url\\(\\s*[\"']?)(.*?)([\"']?\\s*\\))");
-	public static final Pattern JSTL_URL_PATTERN = Pattern.compile("(<c:url[^>]+value=\")(/{1}.*?)(\"[^>]+>)");
-	public static final Pattern DOLLAR_SIGN = Pattern.compile("\\$");
+	private static final Pattern LINK_PATTERN = Pattern.compile("(<link[^>]+href=[\"'])(.*?)([\"'][^>]*>)");
+	private static final Pattern SCRIPT_PATTERN = Pattern.compile("([\"'])([^\\s]*?\\.js)([\"'])");
+	private static final Pattern IMG_PATTERN = Pattern.compile("(<img[^>]+src=[\"'])(.*?)([\"'][^>]+>)");
+	private static final Pattern CSS_URL_PATTERN = Pattern.compile("(url\\(\\s*[\"']?)(.*?)([\"']?\\s*\\))");
+	private static final Pattern JSTL_URL_PATTERN = Pattern.compile("(<c:url[^>]+value=\")(/{1}.*?)(\"[^>]+>)");
+	private static final Pattern DOLLAR_SIGN = Pattern.compile("\\$");
 
 	/**
 	 * target directory
@@ -167,7 +164,7 @@ public class FingerprintMojo extends AbstractMojo {
 			processedData = outputFileData.toString();
 		}
 
-		File targetFile = new File(targetDirectory, stripSourceDirectory(sourceDirectory, sourceFile));
+		File targetFile = new File(targetDirectory, Util.stripSourceDirectory(sourceDirectory, sourceFile));
 		try (FileWriter w = new FileWriter(targetFile)) {
 			IOUtils.write(processedData, w);
 		} catch (IOException e) {
@@ -219,7 +216,7 @@ public class FingerprintMojo extends AbstractMojo {
 					continue;
 				}
 				logIfRelativePath(curLink);
-				targetPath = generateTargetResourceFilename(curLinkFile, curLink, namePattern);
+				targetPath = Util.generateTargetResourceFilename(curLinkFile, curLink, namePattern);
 				logIfRelativePath(targetPath);
 
 				sourceToFingerprintedTarget.put(curLink, targetPath);
@@ -254,29 +251,6 @@ public class FingerprintMojo extends AbstractMojo {
 			}
 		}
 		return false;
-	}
-
-	static String generateTargetResourceFilename(File sourceFile, String sourceFilename, String namePattern) throws MojoExecutionException {
-		String fingerprint;
-		try (FileInputStream fis = new FileInputStream(sourceFile)) {
-			fingerprint = DigestUtils.md5Hex(fis);
-		} catch (Exception e1) {
-			throw new MojoExecutionException("unable to calculate md5 for file: " + sourceFile.getAbsolutePath(), e1);
-		}
-		String filename = FilenameUtils.getBaseName(sourceFilename);
-		String extension = FilenameUtils.getExtension(sourceFilename);
-
-		Map<String, String> values = new HashMap<>();
-		values.put("name", filename);
-		values.put("hash", fingerprint);
-		values.put("ext", extension);
-
-		StringSubstitutor sub = new StringSubstitutor(values, "[", "]");
-		return FilenameUtils.getFullPath(sourceFilename) + sub.replace(namePattern);
-	}
-
-	static String stripSourceDirectory(File sourceDirectory, File file) {
-		return file.getAbsolutePath().substring(sourceDirectory.getAbsolutePath().length());
 	}
 
 	private void mkdirsRecursively(File curSrcDirectory, File curDestDirectory) {

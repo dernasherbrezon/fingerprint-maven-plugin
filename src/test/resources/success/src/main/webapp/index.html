@@ -16,6 +16,8 @@
 		rel='stylesheet' 
 		href='/css/custom.css'
 		>
+		<!-- jsp variables preserved and won't fingerprint resource -->
+		<link rel="stylesheet" href="${pageContext.request.contextPath}/css/custom.css" />
 		
 		<script type="text/javascript" src="/js/script.js"></script>
 		<script type="text/javascript" src="/js/script.min.js"></script>
@@ -26,6 +28,8 @@
 		type="text/javascript" 
 		src='/js/script.js'
 		></script>
+		<!-- jsp variables preserved and won't fingerprint resource -->
+		<script type="text/javascript" src="${pageContext.request.contextPath}/js/script.js"></script>
 		
 	</head>
 	<body class='home type-page has-sidebar'>
@@ -41,6 +45,8 @@
 		<img class="someclass" src="relative.png"/>
 		<!-- ignored -->
 		<img class="someclass" src="data:image/gif;base64,R0lGODlhEAAOALMAAOazToeHh0tLS/7LZv/0jvb29t/f3//Ub//ge8WSLf/rhf/3kdbW1mxsbP//mf///yH5BAAAAAAALAAAAAAQAA4AAARe8L1Ekyky67QZ1hLnjM5UUde0ECwLJoExKcppV0aCcGCmTIHEIUEqjgaORCMxIC6e0CcguWw6aFjsVMkkIr7g77ZKPJjPZqIyd7sJAgVGoEGv2xsBxqNgYPj/gAwXEQA7"/>
+		<!-- jsp variables preserved and won't fingerprint resource -->
+		<img class="someclass" src="${pageContext.request.contextPath}/img/img.png" />
 		
 		<!-- default type='text' should be removed -->
 		<input class="someclass" type="text" name="test" value="test"/>

@@ -8,3 +8,7 @@
 .someclass {
 	float: left;
 }
+
+.noquotes: {
+	background: url(/img/img.png) repeat-y;	
+};
