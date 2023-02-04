@@ -8,6 +8,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -103,16 +104,17 @@ public class FingerprintMojo extends AbstractMojo {
 			getLog().info("no files to optimize found");
 			return;
 		}
-		List<File> filesToOptimize = new ArrayList<>();
-		findFilesToOptimize(filesToOptimize, sourceDirectory);
-		if (filesToOptimize.isEmpty()) {
-			getLog().info("no files to optimize were found");
+		List<File> filesToProcess = new ArrayList<>();
+		findFilesRecursively(filesToProcess, sourceDirectory);
+		if (filesToProcess.isEmpty()) {
+			getLog().info("no files to optimize found");
 			return;
 		}
+		Collections.sort(filesToProcess, new FileComparator(htmlExtensions));
 
-		mkDirs(sourceDirectory, targetDirectory);
+		mkdirsRecursively(sourceDirectory, targetDirectory);
 
-		for (File cur : filesToOptimize) {
+		for (File cur : filesToProcess) {
 			try {
 				process(cur);
 				processedFiles.add(cur.getAbsolutePath());
@@ -122,7 +124,7 @@ public class FingerprintMojo extends AbstractMojo {
 			}
 		}
 
-		copyDeepFiles(sourceDirectory, targetDirectory);
+		deepCopyRemainingFiles(sourceDirectory, targetDirectory);
 
 		for (Entry<String, String> cur : sourceToFingerprintedTarget.entrySet()) {
 			File toMove = new File(targetDirectory, cur.getKey());
@@ -145,12 +147,10 @@ public class FingerprintMojo extends AbstractMojo {
 		outputFileData = processPattern(CSS_URL_PATTERN, outputFileData.toString(), sourceFile.getAbsolutePath());
 		outputFileData = processPattern(JSTL_URL_PATTERN, outputFileData.toString(), sourceFile.getAbsolutePath());
 		String processedData = null;
-		if (htmlExtensions != null && !htmlExtensions.isEmpty()) {
-			String extension = getExtension(sourceFile.getName());
-			if (extension != null && htmlExtensions.contains(extension) && minifyHtml) {
-				getLog().info("minifying html: " + sourceFile.getAbsolutePath());
-				processedData = HtmlMinifier.minify(outputFileData.toString());
-			}
+		String extension = Util.getExtension(sourceFile.getName());
+		if (htmlExtensions != null && !htmlExtensions.isEmpty() && extension != null && htmlExtensions.contains(extension) && minifyHtml) {
+			getLog().info("minifying html: " + sourceFile.getAbsolutePath());
+			processedData = HtmlMinifier.minify(outputFileData.toString());
 		} else if (sourceFile.getName().contains(".min.")) {
 			getLog().info("ignoring already minified resource: " + sourceFile.getAbsolutePath());
 		} else if (sourceFile.getName().endsWith(".js") && minifyJs) {
@@ -205,7 +205,12 @@ public class FingerprintMojo extends AbstractMojo {
 
 			String targetPath = sourceToFingerprintedTarget.get(curLink);
 			if (targetPath == null) {
-				File curLinkFile = new File(sourceDirectory, curLink);
+				// try fingerprinted file first
+				// if out of scope, then calculate fingerprint from the source file
+				File curLinkFile = new File(targetDirectory, curLink);
+				if (!curLinkFile.exists()) {
+					curLinkFile = new File(sourceDirectory, curLink);
+				}
 				if (!curLinkFile.exists()) {
 					getLog().warn("resource file doesn't exist: " + curLink + " found in: " + sourceOfData);
 					// escape dollar sign in result output
@@ -274,7 +279,7 @@ public class FingerprintMojo extends AbstractMojo {
 		return file.getAbsolutePath().substring(sourceDirectory.getAbsolutePath().length());
 	}
 
-	private void mkDirs(File curSrcDirectory, File curDestDirectory) {
+	private void mkdirsRecursively(File curSrcDirectory, File curDestDirectory) {
 		if (!curSrcDirectory.isDirectory()) {
 			return;
 		}
@@ -288,15 +293,15 @@ public class FingerprintMojo extends AbstractMojo {
 				getLog().warn("unable to create directory in outputDirectory: " + newDir);
 				continue;
 			}
-			mkDirs(curFile, newDir);
+			mkdirsRecursively(curFile, newDir);
 		}
 	}
 
-	private void copyDeepFiles(File srcDir, File dstDir) throws MojoExecutionException {
+	private void deepCopyRemainingFiles(File srcDir, File dstDir) throws MojoExecutionException {
 		File[] srcFiles = srcDir.listFiles();
 		for (File curFile : srcFiles) {
 			if (curFile.isDirectory()) {
-				copyDeepFiles(curFile, new File(dstDir, curFile.getName()));
+				deepCopyRemainingFiles(curFile, new File(dstDir, curFile.getName()));
 				continue;
 			}
 
@@ -320,14 +325,14 @@ public class FingerprintMojo extends AbstractMojo {
 		}
 	}
 
-	private void findFilesToOptimize(List<File> output, File source) {
+	private void findFilesRecursively(List<File> output, File source) {
 		if (!source.isDirectory()) {
 			return;
 		}
 		File[] subFiles = source.listFiles();
 		for (File curFile : subFiles) {
 			if (curFile.isDirectory()) {
-				findFilesToOptimize(output, curFile);
+				findFilesRecursively(output, curFile);
 				continue;
 			}
 
@@ -335,7 +340,7 @@ public class FingerprintMojo extends AbstractMojo {
 				continue;
 			}
 
-			String extension = getExtension(curFile.getName());
+			String extension = Util.getExtension(curFile.getName());
 			if (extension == null) {
 				continue;
 			}
@@ -345,14 +350,6 @@ public class FingerprintMojo extends AbstractMojo {
 				continue;
 			}
 		}
-	}
-
-	private static String getExtension(String filename) {
-		int extensionIndex = filename.lastIndexOf('.');
-		if (extensionIndex == -1) {
-			return null;
-		}
-		return filename.substring(extensionIndex + 1);
 	}
 
 }

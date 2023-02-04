@@ -43,6 +43,7 @@
 						<extensionToFilter>jsp</extensionToFilter>
 						<extensionToFilter>tag</extensionToFilter>
 						<extensionToFilter>css</extensionToFilter>
+						<extensionToFilter>js</extensionToFilter>
 					</extensionsToFilter>
 					<excludeResources>
 						<excludeResource>search.xml</excludeResource>
