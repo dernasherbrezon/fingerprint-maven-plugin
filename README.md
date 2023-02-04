@@ -1,7 +1,7 @@
 fingerprint-maven-plugin [![Build Status](https://travis-ci.com/dernasherbrezon/fingerprint-maven-plugin.svg?branch=master)](https://travis-ci.com/dernasherbrezon/fingerprint-maven-plugin) [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=com.aerse.maven%3Afingerprint-maven-plugin&metric=alert_status)](https://sonarcloud.io/dashboard?id=com.aerse.maven%3Afingerprint-maven-plugin)
 ========================
 
-Maven plugin for web resources optimization
+Fingerprint and optimize web resources.
 
 About
 ---------------------
@@ -9,18 +9,18 @@ About
 This plugin performs several optimizations:
   * Resource fingerprinting.
   * JS/CSS minification. yuicompressor is used
-  * html minification.  
+  * HTML minification.  
   
 ### Fingerprinting
 
 During this process plugin calculates file checksum and prepends it to the file name. All links to this filename will be changed to the fingerprinted version. Original file will be deleted. Fingerprinting used to improve web resource caching. If file checksum is not changed, then the name will be the same and it is safe to add max expires header. Once file contents are changed, checksum will be changed as well. This plugin filters out (recursivly) source directory, detects any resources using the patterns below and copy result (if needed) to the target directory.
 
 The following patterns are used to detect resources eligible for fingerprinting:
-  * `<link[^>]+href="(.*?)"[^>]*>`
-  * `"([^\s]*?\.js)"`
-  * `<img[^>]+src="([^\}\{]*?)"[^>]+>`
+  * `<link[^>]+href=["'](.*?)["'][^>]*>`
+  * `["']([^\s]*?\.js)["']`
+  * `<img[^>]+src=["'](.*?)["'][^>]+>`
   * `url\(\s*["']?(.*?)["']?\s*\)`
-  * `<c:url[^>]+value="(/{1}.*?)"[^>]+>`
+  * `<c:url[^>]+value="({1}.*?)"[^>]+>`
 
 After fingerprinting it is safe to add max expires header. 
 
@@ -29,14 +29,18 @@ Requirements
   * All resources should have absolute paths:
     * Valid: `<img src="/img/test.png">`
     * Invalid: `<img src="test.png">`
+  * JSP contextPath is supported:
+    * Valid: `<img src="${pageContext.request.contextPath}/img/test.png">`
+    * Invalid: `<img src="${   pageContext.request.contextPath   }/test.png">`
   * All resources should point to existing files without any pre-processing:
     * Valid: `<img src="/img/test.png">`
     * Invalid: `<img src="<c:if test="${var}">/img/test.png</c:if>"`
+    * Invalid: `<img src="${seome.variable}/img/test.png"`
 
 ### HTML minification
 
 During html minification:
-  * all space between tags will be removed. Except `pre`.
+  * all extra spaces between tags will be removed. Except `pre`.
   * `type="text"` will be removed from `input` tags since it's default type. 
 
 Configuration

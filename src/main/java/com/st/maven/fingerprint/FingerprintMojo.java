@@ -38,8 +38,12 @@ public class FingerprintMojo extends AbstractMojo {
 	private static final Pattern SCRIPT_PATTERN = Pattern.compile("([\"'])([^\\s]*?\\.js)([\"'])");
 	private static final Pattern IMG_PATTERN = Pattern.compile("(<img[^>]+src=[\"'])(.*?)([\"'][^>]+>)");
 	private static final Pattern CSS_URL_PATTERN = Pattern.compile("(url\\(\\s*[\"']?)(.*?)([\"']?\\s*\\))");
-	private static final Pattern JSTL_URL_PATTERN = Pattern.compile("(<c:url[^>]+value=\")(/{1}.*?)(\"[^>]+>)");
+	private static final Pattern JSTL_URL_PATTERN = Pattern.compile("(<c:url[^>]+value=\")({1}.*?)(\"[^>]+>)");
 	private static final Pattern DOLLAR_SIGN = Pattern.compile("\\$");
+
+	// this is very specific and most commonly used .jsp expression
+	private static final String PAGE_CONTEXT_PREFIX = "${pageContext.request.contextPath}";
+	private static final String PAGE_CONTEXT_PREFIX_ESCAPED = "\\$\\{pageContext.request.contextPath\\}";
 
 	/**
 	 * target directory
@@ -184,6 +188,8 @@ public class FingerprintMojo extends AbstractMojo {
 			}
 			if (isExcluded(curLink)) {
 				getLog().info("resource excluded: " + curLink);
+				// escape dollar sign in result output
+				curLink = DOLLAR_SIGN.matcher(curLink).replaceAll("\\\\\\$");
 				m.appendReplacement(outputFileData, "$1" + curLink + "$3");
 				continue;
 			}
@@ -199,6 +205,11 @@ public class FingerprintMojo extends AbstractMojo {
 					curLink = curLink.substring(0, queryIndex);
 				}
 			}
+			String prefix = "";
+			if (curLink.startsWith(PAGE_CONTEXT_PREFIX)) {
+				prefix = PAGE_CONTEXT_PREFIX_ESCAPED;
+				curLink = curLink.substring(PAGE_CONTEXT_PREFIX.length());
+			}
 
 			String targetPath = sourceToFingerprintedTarget.get(curLink);
 			if (targetPath == null) {
@@ -212,7 +223,7 @@ public class FingerprintMojo extends AbstractMojo {
 					getLog().warn("resource file doesn't exist: " + curLink + " found in: " + sourceOfData);
 					// escape dollar sign in result output
 					curLink = DOLLAR_SIGN.matcher(curLink).replaceAll("\\\\\\$");
-					m.appendReplacement(outputFileData, "$1" + curLink + "$3");
+					m.appendReplacement(outputFileData, "$1" + prefix + curLink + "$3");
 					continue;
 				}
 				logIfRelativePath(curLink);
@@ -224,9 +235,9 @@ public class FingerprintMojo extends AbstractMojo {
 
 			String targetURL;
 			if (cdn == null) {
-				targetURL = "$1" + targetPath + query + "$3";
+				targetURL = "$1" + prefix + targetPath + query + "$3";
 			} else {
-				targetURL = "$1" + cdn + targetPath + query + "$3";
+				targetURL = "$1" + cdn + prefix + targetPath + query + "$3";
 			}
 
 			m.appendReplacement(outputFileData, targetURL);
