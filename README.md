@@ -1,4 +1,4 @@
-fingerprint-maven-plugin [![Build Status](https://travis-ci.com/dernasherbrezon/fingerprint-maven-plugin.svg?branch=master)](https://travis-ci.com/dernasherbrezon/fingerprint-maven-plugin) [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=com.aerse.maven%3Afingerprint-maven-plugin&metric=alert_status)](https://sonarcloud.io/dashboard?id=com.aerse.maven%3Afingerprint-maven-plugin)
+fingerprint-maven-plugin [![Main Workflow](https://github.com/dernasherbrezon/fingerprint-maven-plugin/actions/workflows/build.yml/badge.svg)](https://github.com/dernasherbrezon/fingerprint-maven-plugin/actions/workflows/build.yml) [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=com.aerse.maven%3Afingerprint-maven-plugin&metric=alert_status)](https://sonarcloud.io/dashboard?id=com.aerse.maven%3Afingerprint-maven-plugin)
 ========================
 
 Fingerprint and optimize web resources.
@@ -20,7 +20,7 @@ The following patterns are used to detect resources eligible for fingerprinting:
   * `["']([^\s]*?\.js)["']`
   * `<img[^>]+src=["'](.*?)["'][^>]+>`
   * `url\(\s*["']?(.*?)["']?\s*\)`
-  * `<c:url[^>]+value="({1}.*?)"[^>]+>`
+  * `<c:url[^>]+value="(.*?)"[^>]+>`
 
 After fingerprinting it is safe to add max expires header. 
 
