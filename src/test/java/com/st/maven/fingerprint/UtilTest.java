@@ -26,7 +26,7 @@ public class UtilTest {
 		String defaultPattern = "[hash][name].[ext]";
 		File file = new File("src/test/resources/dummy-file-for-testing.txt");
 		String resultFilename = Util.generateTargetResourceFilename(file, "dummy-file-for-testing.txt", defaultPattern);
-		assertEquals(resultFilename, "331afe01c54815562adc514c6b5eb561dummy-file-for-testing.txt");
+		assertEquals("331afe01c54815562adc514c6b5eb561dummy-file-for-testing.txt", resultFilename);
 	}
 
 	@Test
@@ -34,7 +34,7 @@ public class UtilTest {
 		String namePattern = "[hash].[name].[ext]";
 		File file = new File("src/test/resources/dummy-file-for-testing.txt");
 		String resultFilename = Util.generateTargetResourceFilename(file, "dummy-file-for-testing.txt", namePattern);
-		assertEquals(resultFilename, "331afe01c54815562adc514c6b5eb561.dummy-file-for-testing.txt");
+		assertEquals("331afe01c54815562adc514c6b5eb561.dummy-file-for-testing.txt", resultFilename);
 	}
 
 	@Test
@@ -42,7 +42,7 @@ public class UtilTest {
 		String namePattern = "[name].[ext]?hash=[hash]";
 		File file = new File("src/test/resources/dummy-file-for-testing.txt");
 		String resultFilename = Util.generateTargetResourceFilename(file, "dummy-file-for-testing.txt", namePattern);
-		assertEquals(resultFilename, "dummy-file-for-testing.txt?hash=331afe01c54815562adc514c6b5eb561");
+		assertEquals("dummy-file-for-testing.txt?hash=331afe01c54815562adc514c6b5eb561", resultFilename);
 	}
 
 	@Test
@@ -50,6 +50,6 @@ public class UtilTest {
 		String namePattern = "[name].[hash].[ext][sv]";
 		File file = new File("src/test/resources/dummy-file-for-testing.txt");
 		String resultFilename = Util.generateTargetResourceFilename(file, "dummy-file-for-testing.txt", namePattern);
-		assertEquals(resultFilename, "dummy-file-for-testing.331afe01c54815562adc514c6b5eb561.txt[sv]");
+		assertEquals("dummy-file-for-testing.331afe01c54815562adc514c6b5eb561.txt[sv]", resultFilename);
 	}
 }

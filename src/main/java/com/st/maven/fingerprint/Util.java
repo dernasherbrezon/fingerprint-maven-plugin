@@ -19,7 +19,7 @@ class Util {
 		}
 		return filename.substring(extensionIndex + 1);
 	}
-	
+
 	static String stripSourceDirectory(File sourceDirectory, File file) {
 		return file.getAbsolutePath().substring(sourceDirectory.getAbsolutePath().length());
 	}
@@ -41,5 +41,9 @@ class Util {
 
 		StringSubstitutor sub = new StringSubstitutor(values, "[", "]");
 		return FilenameUtils.getFullPath(sourceFilename) + sub.replace(namePattern);
+	}
+
+	private Util() {
+		// do nothing
 	}
 }

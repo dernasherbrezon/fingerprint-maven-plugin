@@ -11,13 +11,16 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     
-    - name: Configure cache
-      id: maven-cache
+    - name: Cache
       uses: actions/cache@v3
       with:
-        path: $HOME/.m2/
-        key: maven-cache
-     
+        path: |
+          ~/.m2/repository
+          ~/.sonar/cache
+        key: ${{ runner.os }}-maven
+        restore-keys: |
+          ${{ runner.os }}-maven-
+      
     - name: SonarCloud Scan
       run: mvn clean verify sonar:sonar -Pcoverage -Dsonar.scm.disabled=true -Dsonar.projectKey=com.aerse.maven:fingerprint-maven-plugin -Dsonar.organization=dernasherbrezon-github -Dsonar.host.url=https://sonarcloud.io -Dsonar.language=java
       env:
