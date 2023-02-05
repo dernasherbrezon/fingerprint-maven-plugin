@@ -38,7 +38,7 @@ public class FingerprintMojo extends AbstractMojo {
 	private static final Pattern SCRIPT_PATTERN = Pattern.compile("([\"'])([^\\s]*?\\.js)([\"'])");
 	private static final Pattern IMG_PATTERN = Pattern.compile("(<img[^>]+src=[\"'])(.*?)([\"'][^>]+>)");
 	private static final Pattern CSS_URL_PATTERN = Pattern.compile("(url\\(\\s*[\"']?)(.*?)([\"']?\\s*\\))");
-	private static final Pattern JSTL_URL_PATTERN = Pattern.compile("(<c:url[^>]+value=\")({1}.*?)(\"[^>]+>)");
+	private static final Pattern JSTL_URL_PATTERN = Pattern.compile("(<c:url[^>]+value=\")(.*?)(\"[^>]+>)");
 	private static final Pattern DOLLAR_SIGN = Pattern.compile("\\$");
 
 	// this is very specific and most commonly used .jsp expression
